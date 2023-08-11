@@ -1,7 +1,9 @@
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 
 namespace NLayer.API.Controllers
 {
+    [EnableCors("AllowMyOrigin")]
     [ApiController]
     [Route("[controller]")]
     public class WeatherForecastController : ControllerBase
