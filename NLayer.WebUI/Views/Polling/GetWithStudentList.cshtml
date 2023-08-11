@@ -1,0 +1,334 @@
+﻿@model NLayer.Core.Concreate.Polling
+@{
+    ViewData["Title"] = "GetWithStudentList";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@{
+    int id = 1;
+    decimal TotalStudent = 0;
+
+
+}
+<div id="content" class="main-content">
+    <div class="layout-px-spacing">
+
+        <div class="middle-content container-xxl p-0">
+
+            <div class="row invoice layout-top-spacing layout-spacing">
+                <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+
+                    <div class="doc-container">
+
+                        <div class="row">
+
+                            <div class="col-xl-9">
+
+                                <div class="invoice-container">
+                                    <div class="invoice-inbox">
+
+                                        <div id="ct" class="">
+
+                                            <div class="invoice-00001">
+                                                <div class="content-section">
+
+                                                    <div class="inv--head-section inv--detail-section">
+                                                        <div class="col-sm-12 col-12 mr-auto">
+                                                            <div class="d-flex justify-content-center align-items-center" style="height: auto;">
+                                                                <img src="/cork-v3.8.0/Metaakdeniz.png" alt="company" style="width:40%">
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="row">
+
+                                                            <div class="col-sm-6 col-12 mr-auto">
+                                                                <br />
+                                                                <div>
+                                                                    <div class="d-flex">
+                                                                          <img class="company-logo" src="/cork-v3.8.0/Class-Foto/@Model.Class.ImageUrl" alt="company">
+                                                                        <h3 class="in-heading align-self-center">@Model.Class.Name</h3>
+                                                                    </div>
+                                                                    <p class="inv-street-addr mt-3">Yoklama Adı:@Model.Name</p>
+                                                                    <p class="inv-email-address">Açılaması: @Model.Description</p>
+                                                                </div>
+                                                            </div>
+                                                            <br />
+
+                                                            <div class="col-sm-6 text-sm-end" style="margin-top:90px">
+                                                               
+                                                                <span class="inv-date">
+                                                                    Yoklama Tarihi:
+                                                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-calendar">
+                                                                        <rect x="3" y="4" width="16" height="16" rx="2" ry="2"></rect>
+                                                                        <line x1="16" y1="2" x2="16" y2="6"></line>
+                                                                        <line x1="8" y1="2" x2="8" y2="6"></line>
+                                                                        <line x1="3" y1="10" x2="21" y2="10"></line>
+                                                                    </svg>
+                                                                
+                                                                    @DateTime.Parse(Model.PollingDate.ToString()).ToString("dd MM ddd")
+
+
+                                                                </span>
+
+                                                            </div>
+                                                        </div>
+                                                    
+                                                    </div>
+                                                    <div class="text-center">
+                                                        <strong>Yok Yazılan Öğrenciler</strong>
+                                                    </div>
+                                                 
+                                                    <div class="inv--product-table-section">
+                                                        <div class="table-responsive">
+                                                            <table class="table">
+                                                                <thead class="">
+                                                                    <tr>
+                                                                        <th scope="col">S.No</th>
+                                                                        <th scope="col">Öğrenci</th>
+                                                                        <th class="col" >Veli</th>
+                                                                        <th class="col" >İletişim</th>
+                                                                        <th class="col" >Tarih</th>
+                                                                    </tr>
+                                                                </thead>
+                                                                <tbody>
+                                                                    @foreach (var item in Model.StudentPollings)
+                                                                    {
+                                                                        <tr>
+                                                                            <td>@id</td>
+                                                                            <td>@item.Student.Name @item.Student.SurName</td>
+                                                                            <td>@item.Student.GuardianName @item.Student.GuardianSurName</td>
+                                                                            <td>@item.Student.GuardianPhone</td>
+                                                                            <td>
+                                                                                <span class="inv-date">
+                                                                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-calendar">
+                                                                                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                                                                                        <line x1="16" y1="2" x2="16" y2="6"></line>
+                                                                                        <line x1="8" y1="2" x2="8" y2="6"></line>
+                                                                                        <line x1="3" y1="10" x2="21" y2="10"></line>
+                                                                                    </svg>
+                                                                                    @DateTime.Parse(Model.CreatedDate.ToString()).ToString("ddd MM ")
+
+                                                                                </span>
+                                                                            </td>
+
+                                                                        </tr>
+
+                                                                        TotalStudent++;
+                                                                        id++;
+                                                                    }
+                                                                    
+
+
+                                                                
+                                                                </tbody>
+                                                            </table>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="inv--total-amounts">
+
+                                                        <div class="row mt-4">
+                                                            <div class="col-sm-5 col-12 order-sm-0 order-1">
+                                                            </div>
+                                                            <div class="col-sm-7 col-12 order-sm-1 order-0">
+                                                                <div class="text-sm-end">
+                                                                    <div class="row">
+                                                                        
+                                                                        <div class="col-sm-8 col-7">
+                                                                            <p class="">Yok Yazılan Toplam Öğrenci:</p>
+                                                                        </div>
+                                                                        <div class="col-sm-4 col-5">
+                                                                            <p class="" style="color:red">@TotalStudent</p>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="inv--note">
+
+                                                        <div class="row mt-4">
+                                                            <div class="col-sm-12 col-12 order-sm-0 order-1">
+                                                                <p>Not: Bizimle çalıştığınız için teşekkür eder, iyi çalışmalar dileriz.</p>
+                                                            </div>
+                                                        </div>
+
+                                                    </div>
+
+                                                </div>
+
+                                            </div>
+
+                                        </div>
+
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                            <div class="col-xl-3">
+
+                                <div class="invoice-actions-btn">
+
+                                    <div class="invoice-action-btn">
+                                        <div class="row">
+                                            <div class="col-xl-12 col-md-3 col-sm-6">
+                                                <a href="javascript:void(0);" class="btn btn-primary btn-print action-print">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-printer align-middle me-2">
+                                                        <polyline points="6 9 6 2 18 2 18 9"></polyline>
+                                                        <path d="M18 13v3a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1v-3"></path>
+                                                        <path d="M9 22V12h6v10"></path>
+                                                    </svg>
+                                                    Yazdır
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+    <!--  BEGIN FOOTER  -->
+    <div class="footer-wrapper">
+        <div class="footer-section f-section-1">
+            <p class="">Copyright © <span class="dynamic-year">2022</span> <a target="_blank" href="https://designreset.com/cork-admin/">DesignReset</a>, All rights reserved.</p>
+        </div>
+        <div class="footer-section f-section-2">
+            <p class="">Coded with <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-heart"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg></p>
+        </div>
+    </div>
+    <!--  END FOOTER  -->
+</div>
+@*<div id="zoomupModal" class="modal animated fadeInRight custo-fadeInRight" role="dialog" style="height: 100vh;">
+    <div class="modal-dialog modal-lg" style="height: 100%;">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Ödeme Ekleme</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+                    <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-x"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                </button>
+            </div>
+            <div class="modal-body">
+                <!-- Modal body content -->
+
+                <div>
+                    <a href="javascript:void(0);" class="btn btn-primary btn-print action-print">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-printer align-middle me-2">
+                            <polyline points="6 9 6 2 18 2 18 9"></polyline>
+                            <path d="M18 13v3a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1v-3"></path>
+                            <path d="M9 22V12h6v10"></path>
+                        </svg>
+                        Yazdır
+                    </a>
+                </div>
+                <div class="middle-content container-xxl p-0">
+                    <div class="row invoice layout-top-spacing layout-spacing">
+                        <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12" style="height: auto;">
+                            <div class="doc-container">
+                                <div class="row">
+                                    <div class="col-xl-12">
+                                        <div class="invoice-container">
+                                            <div class="invoice-inbox">
+                                                <div id="ct" class="">
+                                                    <div class="invoice-00001">
+                                                        <div class="content-section">
+                                                            <div class="inv--head-section inv--detail-section">
+                                                                <div class="col-sm-12 col-12 mr-auto">
+                                                                    <div class="d-flex justify-content-center align-items-center" style="height: auto;">
+                                                                        <img src="/cork-v3.8.0/Metaakdeniz.png" alt="company" style="width:40%">
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="inv--detail-section inv--customer-detail-section">
+                                                                <div class="row justify-content-center">
+                                                                    <div class="col-xl-8 col-lg-7 col-md-6 col-sm-4">
+                                                                        <p class="inv-to text-center"><img src="/cork-v3.8.0/Class-Foto/@Model.Class.ImageUrl" alt="company" style="width:14%"> @Model.Class.Name Dersi Yoklaması</p>
+                                                                        <p class="inv-street-addr text-center"><strong>Açıklama: @Model.Description</strong></p>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="inv--product-table-section">
+                                                                <div class="table-responsive">
+                                                                    <table class="table">
+                                                                        <thead class="">
+                                                                            <tr>
+                                                                                <th scope="col">S.No</th>
+                                                                                <th scope="col">Ad-Soyad</th>
+                                                                                <th class="text-end" scope="col">Veli-Ad-Soyad</th>
+                                                                                <th class="text-end" scope="col">Veli-Telefon</th>
+                                                                                <th class="text-end" scope="col">Tarih</th>
+                                                                            </tr>
+                                                                        </thead>
+                                                                        <tbody>
+
+                                                                            @foreach (var item in Model.StudentPollings)
+                                                                            {
+                                                                            <td>@item.Student.Name  @item.Student.SurName</td>
+                                                                            }
+                                                                        </tbody>
+                                                                    </table>
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="inv--total-amounts">
+
+                                                                <div class="row mt-4">
+                                                                    <div class="col-sm-5 col-12 order-sm-0 order-1">
+                                                                    </div>
+                                                                    <div class="col-sm-7 col-12 order-sm-1 order-0">
+                                                                        <div class="text-sm-end">
+                                                                            <div class="row">
+                                                                                <div class="col-sm-8 col-7">
+                                                                                    <p class="">Ödenen Toplam Tutar :</p>
+                                                                                </div>
+                                                                               
+                                                                                <div class="col-sm-8 col-7">
+                                                                                    <p class="">Ödenecek Miktar:</p>
+                                                                                </div>
+                                                                             
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="inv--note">
+                                                                <div class="row mt-4">
+                                                                    <div class="col-sm-12 col-12">
+                                                                        <p>Not: Bizimle çalıştığınız için teşekkür eder, iyi çalışmalar dileriz.</p>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>*@
+

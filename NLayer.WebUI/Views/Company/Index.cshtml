@@ -1,0 +1,615 @@
+﻿@using NLayer.Core.DTOs.CompanyDtos
+@model List<CompanyDto>
+
+@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+@section Scripts{
+    <script src="~/jquery/jquery/jquery.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $('.CompanyBtn').click(function () {
+                var companyName = document.querySelector('input[name="CompanyName"]').value;
+                var companyOffical = document.querySelector('input[name="CompanyOffical"]').value;
+                var companyTitle = document.querySelector('input[name="CompanyTitle"]').value;
+
+                var officalTCKN = document.querySelector('input[name="OfficalTCKN"]').value;
+                var officalName = document.querySelector('input[name="OfficalName"]').value;
+                var officalSurname = document.querySelector('input[name="OfficalSurname"]').value;
+                var officalTitle = document.querySelector('input[name="OfficalTitle"]').value;
+                var officalPhone = document.querySelector('input[name="OfficalPhone"]').value;
+                var officalEmail = document.querySelector('input[name="OfficalEmail"]').value;
+                var officalAddress = document.querySelector('textarea[name="OfficalAdress"]').value;
+
+                var companyPhone = document.querySelector('input[name="CompanyPhone"]').value;
+                var companyPhone2 = document.querySelector('input[name="CompanyPhone2"]').value;
+                var companyAddress = document.querySelector('input[name="CompanyAdress"]').value;
+                var companyAddress2 = document.querySelector('input[name="CompanyAdress2"]').value;
+                var companyCity = document.querySelector('input[name="CompanyCity"]').value;
+                var companyDistrict = document.querySelector('input[name="CompanyDistrict"]').value;
+                var zipCode = document.querySelector('input[name="ZipCode"]').value;
+
+                var data = {
+                    CompanyName: companyName,
+                    CompanyOffical: companyOffical,
+                    CompanyTitle: companyTitle,
+                    OfficalTCKN: officalTCKN,
+                    OfficalName: officalName,
+                    OfficalSurname: officalSurname,
+                    OfficalTitle: officalTitle,
+                    OfficalPhone: officalPhone,
+                    OfficalEmail: officalEmail,
+                    OfficalAdress: officalAddress,
+                    CompanyPhone: companyPhone,
+                    CompanyPhone2: companyPhone2,
+                    CompanyAdress: companyAddress,
+                    CompanyAdress2: companyAddress2,
+                    CompanyCity: companyCity,
+                    CompanyDistrict: companyDistrict,
+                    ZipCode: zipCode
+                };
+
+
+                console.log("Sonuç:", data);
+                $.ajax({
+                    type: 'POST',
+                    url: '/Company/Create',
+                    data: data,
+                    success: function (result) {
+                        console.log("Sonuç:", data);
+                    },
+                    error: function (xhr, status, error) {
+                        console.log("Hata:", error);
+                    }
+                });
+            });
+        });
+
+        $('#kaydetButton').click(function () {
+            location.reload();
+        });
+
+    </script>
+    <script>
+        $(".btnGetWhere").click(function () {
+            var id = $(this).data("id");
+
+            $.ajax({
+                contentType: "application/json",
+                dataType: "json",
+                type: "GET",
+                url: "/Company/GetCompanyById",
+                data: { id: id },
+                success: function (response) {
+                    response = JSON.parse(response); // JSON dizesini nesneye dönüştür
+
+                    console.log(response);
+                    // Form inputlarını doldurma işlemi
+                    var formValues = [
+                        { name: "CompanyName", value: response.CompanyName },
+                        { name: "Id", value: response.Id },
+                        { name: "CompanyOffical", value: response.CompanyOffical},
+                        { name: "CompanyTitle", value: response.CompanyTitle },
+                        { name: "OfficalTCKN", value: response.OfficalTCKN },
+                        { name: "OfficalName", value: response.OfficalName },
+                        { name: "OfficalSurname", value: response.OfficalSurname },
+                        { name: "OfficalTitle", value: response.OfficalTitle },
+                        { name: "OfficalPhone", value: response.OfficalPhone },
+                        { name: "OfficalEmail", value: response.OfficalEmail },
+                        { name: "OfficalAdress", value: response.OfficalAdress },
+                        { name: "CompanyPhone", value: response.CompanyPhone },
+                        { name: "CompanyPhone2", value: response.CompanyPhone2 },
+                        { name: "CompanyAdress", value: response.CompanyAdress },
+                        { name: "CompanyAdress2", value: response.CompanyAdress2 },
+                        { name: "CompanyCity", value: response.CompanyCity },
+                        { name: "CompanyDistrict", value: response.CompanyDistrict },
+                        { name: "ZipCode", value: response.ZipCode },
+                    ];
+
+                    formValues.forEach(function (item) {
+                        $('input[name="' + item.name + '"]').val(item.value);
+                        $('textarea[name="' + item.name + '"]').val(item.value);
+
+                    });
+                },
+                error: function (xhr) {
+                    alert("Bir hata oluştu: " + xhr.status + " " + xhr.statusText);
+                },
+            });
+        });
+
+
+
+    </script>
+
+}
+
+
+<div id="content" class="main-content">
+    <div class="layout-px-spacing">
+
+        <div id="rotateleftModal" class="modal animated rotateInDownLeft custo-rotateInDownLeft" role="dialog">
+            <div class="modal-dialog modal-lg">
+                <!-- Modal content-->
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Şirket Kayıt</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+                            <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-x"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="widget-content widget-content-area">
+                            <div class="bs-stepper stepper-form-one">
+                                <div class="bs-stepper-header" role="tablist">
+                                    <div class="step" data-target="#defaultStep-one">
+                                        <button type="button" class="step-trigger" role="tab">
+                                            <span class="bs-stepper-circle">1</span>
+                                            <span class="bs-stepper-label">Şirket Bilgileri</span>
+                                        </button>
+                                    </div>
+                                    <div class="line"></div>
+                                    <div class="step" data-target="#defaultStep-two">
+                                        <button type="button" class="step-trigger" role="tab">
+                                            <span class="bs-stepper-circle">2</span>
+                                            <span class="bs-stepper-label">Yetkili Bilgileri</span>
+                                        </button>
+                                    </div>
+                                    <div class="line"></div>
+                                    <div class="step" data-target="#defaultStep-three">
+                                        <button type="button" class="step-trigger" role="tab">
+                                            <span class="bs-stepper-circle">3</span>
+                                            <span class="bs-stepper-label">
+                                                <span class="bs-stepper-title">İletişim Bilgileri</span>
+                                            </span>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="bs-stepper-content">
+                                    <div id="defaultStep-one" class="content" role="tabpanel">
+                                        <form method="post">
+                                            <div class="form-group mb-4">
+                                                <label for="defaultForm-name">Firma Adı/Unvanı</label>
+                                                <input type="text" name="CompanyName" class="form-control" id="defaultForm-name">
+                                            </div>
+                                            <div class="form-group mb-4">
+                                                <div class="row">
+                                                    <div class="col-6">
+                                                        <label for="defaultForm-name">Mutabakat Yetkilisi</label>
+                                                        <input type="text" name="CompanyOffical" class="form-control" id="defaultForm-name">
+                                                    </div>
+                                                    <div class="col-6">
+                                                        <label for="defaultForm-name">Firma Sıfatı</label>
+                                                        <input type="text" name="CompanyTitle" class="form-control" id="defaultForm-name">
+                                                    </div>
+                                                </div>
+
+                                            </div>
+                                        </form>
+
+                                        <div class="button-action mt-5">
+                                            <button class="btn btn-secondary btn-prev me-3" disabled>Geri</button>
+                                            <button class="btn btn-secondary btn-nxt">İlerle</button>
+                                        </div>
+                                    </div>
+                                    <div id="defaultStep-two" class="content" role="tabpanel">
+                                        <form>
+                                            <div class="row">
+                                                <div class="col-12">
+                                                    <div class="row mb-12">
+                                                        <div class="col">
+                                                            <input type="text" name="OfficalTCKN" class="form-control" placeholder="TC Kimlik Numarası">
+                                                        </div>
+                                                    </div>
+                                                    <br />
+                                                    <div class="row mb-4">
+                                                        <div class="col">
+                                                            <input type="text" class="form-control" name="OfficalName" placeholder="Ad">
+                                                        </div>
+                                                        <div class="col">
+                                                            <input type="text" class="form-control" name="OfficalSurname" placeholder="Soyad">
+                                                        </div>
+                                                    </div>
+                                                    <div class="row mb-4">
+                                                        <div class="input-group col">
+                                                            <div class="input-group-text">
+                                                                <i class="bi bi-person">
+                                                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-person" viewBox="0 0 16 16">
+                                                                        <path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6Zm2-3a2 2 0 1 1-4 0 2 2 0 0 1 4 0Zm4 8c0 1-1 1-1 1H3s-1 0-1-1 1-4 6-4 6 3 6 4Zm-1-.004c-.001-.246-.154-.986-.832-1.664C11.516 10.68 10.289 10 8 10c-2.29 0-3.516.68-4.168 1.332-.678.678-.83 1.418-.832 1.664h10Z" />
+                                                                    </svg>
+                                                                </i>
+                                                            </div>
+                                                            <input type="text" class="form-control" id="inlineFormInputGroupUsername" name="OfficalTitle" placeholder="Statü">
+                                                        </div>
+                                                        <div class="input-group col">
+                                                            <div class="input-group-text">
+                                                                <i class="bi bi-telephone">
+                                                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-telephone" viewBox="0 0 16 16">
+                                                                        <path d="M3.654 1.328a.678.678 0 0 0-1.015-.063L1.605 2.3c-.483.484-.661 1.169-.45 1.77a17.568 17.568 0 0 0 4.168 6.608 17.569 17.569 0 0 0 6.608 4.168c.601.211 1.286.033 1.77-.45l1.034-1.034a.678.678 0 0 0-.063-1.015l-2.307-1.794a.678.678 0 0 0-.58-.122l-2.19.547a1.745 1.745 0 0 1-1.657-.459L5.482 8.062a1.745 1.745 0 0 1-.46-1.657l.548-2.19a.678.678 0 0 0-.122-.58L3.654 1.328zM1.884.511a1.745 1.745 0 0 1 2.612.163L6.29 2.98c.329.423.445.974.315 1.494l-.547 2.19a.678.678 0 0 0 .178.643l2.457 2.457a.678.678 0 0 0 .644.178l2.189-.547a1.745 1.745 0 0 1 1.494.315l2.306 1.794c.829.645.905 1.87.163 2.611l-1.034 1.034c-.74.74-1.846 1.065-2.877.702a18.634 18.634 0 0 1-7.01-4.42 18.634 18.634 0 0 1-4.42-7.009c-.362-1.03-.037-2.137.703-2.877L1.885.511z" />
+                                                                    </svg>
+                                                                </i>
+                                                            </div>
+                                                            <input type="text" class="form-control" id="inlineFormInputGroupUsername" name="OfficalPhone" placeholder="Telefon">
+                                                        </div>
+
+                                                    </div>
+
+                                                    <div class="col-12">
+                                                        <label class="visually-hidden" for="inlineFormInputGroupUsername">Email</label>
+                                                        <div class="input-group">
+                                                            <div class="input-group-text">
+                                                                <i class="bi bi-envelope">
+                                                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-envelope" viewBox="0 0 16 16">
+                                                                        <path d="M0 4a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V4Zm2-1a1 1 0 0 0-1 1v.217l7 4.2 7-4.2V4a1 1 0 0 0-1-1H2Zm13 2.383-4.708 2.825L15 11.105V5.383Zm-.034 6.876-5.64-3.471L8 9.583l-1.326-.795-5.64 3.47A1 1 0 0 0 2 13h12a1 1 0 0 0 .966-.741ZM1 11.105l4.708-2.897L1 5.383v5.722Z" />
+                                                                    </svg>
+                                                                </i>
+                                                            </div>
+                                                            <input type="text" class="form-control" id="inlineFormInputGroupUsername" name="OfficalEmail" placeholder="Email">
+                                                        </div>
+                                                    </div>
+                                                    <br />
+                                                    <div class="row mb-4">
+                                                        <div class="col-12">
+                                                            <div class="form-group">
+                                                                <label for="exampleFormControlTextarea1">Adres</label>
+                                                                <textarea class="form-control" name="OfficalAdress" id="exampleFormControlTextarea1" rows="3"></textarea>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </form>
+
+                                        <div class="button-action mt-5">
+                                            <button class="btn btn-secondary btn-prev me-3">Geri</button>
+                                            <button class="btn btn-secondary btn-nxt">İlerle</button>
+                                        </div>
+                                    </div>
+                                    <div id="defaultStep-three" class="content" role="tabpanel">
+                                        <form class="row g-3" method="post">
+                                            <div class="col-md-6">
+                                                <label for="defaultInputCity" class="form-label">Telefon</label>
+                                                <input type="text" class="form-control" name="CompanyPhone" id="defaultInputCity" placeholder="+90552 525 25 22">
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label for="defaultInputState" class="form-label">Telefon 2 </label>
+                                                <input type="text" class="form-control" name="CompanyPhone2" id="defaultInputCity" placeholder="+90552 525 25 27">
+                                            </div>
+                                            <div class="col-12">
+                                                <label for="defaultInputAddress" class="form-label">Addres</label>
+                                                <input type="text" class="form-control" name="CompanyAdress" id="defaultInputAddress" placeholder="1234 Main St">
+                                            </div>
+                                            <div class="col-12">
+                                                <label for="defaultInputAddress2" class="form-label">Addres 2</label>
+                                                <input type="text" class="form-control" id="defaultInputAddress2" name="CompanyAdress2" placeholder="Apartment, studio, or floor">
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label for="defaultInputCity" class="form-label">Şehir</label>
+                                                <input type="text" class="form-control" id="defaultInputCity" name="CompanyCity" placeholder="Antalya">
+                                            </div>
+                                            <div class="col-md-4">
+                                                <label for="defaultInputState" class="form-label">İlçe</label>
+                                                <input type="text" class="form-control" id="defaultInputCity" name="CompanyDistrict" placeholder="Konyaltı">
+                                            </div>
+                                            <div class="col-md-2">
+                                                <label for="defaultInputZip" class="form-label">Zip</label>
+                                                <input type="text" class="form-control" id="defaultInputZip" name="ZipCode" placeholder="7000">
+                                            </div>
+
+                                        </form>
+                                        <br />
+                                        <button class="btn btn-secondary btn-prev me-3">Geri</button>
+                                        <a class="CompanyBtn btn btn-success me-3" id="kaydetButton">Kaydet</a>
+                                        <div class="button-action mt-3">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+
+        <div id="studentdetail" class="modal animated zoomInUp custo-zoomInUp" role="dialog">
+            <div class="modal-dialog modal-xl">
+                <!-- Modal content-->
+                <div class="modal-content ">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Şirket Detay</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+                            <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-x"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <form asp-controller="Company" asp-action="Update" method="post">
+                            <input type="hidden" name="Id" />
+                            <div class="container" style="display: flex; justify-content: center; align-items: center; height: auto; margin: 0;">
+                            </div>
+                            <br />
+                            <div class="row">
+                                <div class="col-6">
+                                    <div>
+                                        <h3><strong class="text-center">Şirket Bilgileri</strong></h3>
+                                    </div>
+                                    <label for="defaultForm-name">Firma Adı/Unvanı</label>
+                                    <div class="input-group col">
+                                        <div class="input-group-text">
+                                            <i class="bi bi-house-door">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-house-door" viewBox="0 0 16 16">
+                                                    <path d="M8.354 1.146a.5.5 0 0 0-.708 0l-6 6A.5.5 0 0 0 1.5 7.5v7a.5.5 0 0 0 .5.5h4.5a.5.5 0 0 0 .5-.5v-4h2v4a.5.5 0 0 0 .5.5H14a.5.5 0 0 0 .5-.5v-7a.5.5 0 0 0-.146-.354L13 5.793V2.5a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5v1.293L8.354 1.146ZM2.5 14V7.707l5.5-5.5 5.5 5.5V14H10v-4a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5v4H2.5Z" />
+                                                </svg>
+                                            </i>
+                                        </div>
+                                        <input type="text" class="form-control" name="CompanyName" id="inlineFormInputGroupUsername" placeholder="Şirket Adı/Unvanı">
+                                    </div>
+                                    <br />
+                                    <div class="row mb-2">
+                                        <div class="col">
+                                            <label for="defaultForm-name">Mutabakat Yetkilisi</label>
+                                            <input type="text" name="CompanyOffical" class="form-control" placeholder="Mutabakat Yetkilisi">
+                                        </div>
+                                        <div class="col">
+                                            <label for="defaultForm-name">Firma Sıfatı</label>
+                                            <input type="text" name="CompanyTitle" class="form-control" placeholder="Firma Sıfatı">
+                                        </div>
+                                    </div>
+                                    <h3><strong class="text-center">İletişim Bilgileri</strong></h3>
+                                    <div class="row mb-2">
+                                        <div class="col-md-6">
+                                            <label for="defaultInputCity" class="form-label">Telefon</label>
+                                            <input type="text" class="form-control" name="CompanyPhone" id="defaultInputCity" placeholder="+90552 525 25 22">
+                                        </div>
+
+                                        <div class="col-md-6">
+                                            <label for="defaultInputState" class="form-label">Telefon 2 </label>
+                                            <input type="text" class="form-control" name="CompanyPhone2" id="defaultInputCity" placeholder="+90552 525 25 27">
+                                        </div>
+                                    </div>
+                                    <div class="row mb-2">
+                                    <div class="col-12">
+                                        <label for="defaultInputAddress" class="form-label">Addres</label>
+                                        <input type="text" class="form-control" name="CompanyAdress" id="defaultInputAddress" placeholder="1234 Main St">
+                                    </div>
+                                    </div>
+                                    <div class="row mb-2">
+                                    <div class="col-12">
+                                        <label for="defaultInputAddress2" class="form-label">Addres 2</label>
+                                        <input type="text" class="form-control" id="defaultInputAddress2" name="CompanyAdress2" placeholder="Apartment, studio, or floor">
+                                    </div>
+                                    </div>
+                                    <div class="row mb-2">
+                                        <div class="col-md-5">
+                                            <label for="defaultInputCity" class="form-label">Şehir</label>
+                                            <input type="text" class="form-control" id="defaultInputCity" name="CompanyCity" placeholder="Antalya">
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label for="defaultInputState" class="form-label">İlçe</label>
+                                            <input type="text" class="form-control" id="defaultInputCity" name="CompanyDistrict" placeholder="Konyaltı">
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label for="defaultInputZip" class="form-label">Zip</label>
+                                            <input type="text" class="form-control" id="defaultInputZip" name="ZipCode" placeholder="7000">
+                                        </div>
+                                    </div>
+
+
+                                </div>
+                                <div class="col-6">
+                                    <h3><strong class="text-center">Yetkili Bilgileri</strong></h3>
+                                    <div class="row mb-12">
+
+                                        <div class="col">
+                                            <label for="defaultForm-name">Yetkili TCKN</label>
+                                            <input type="text" name="OfficalTCKN" class="form-control" placeholder="TC Kimlik Numarası">
+                                        </div>
+                                    </div>
+                                    <br />
+                                    <div class="row mb-2">
+                                        <div class="col">
+                                            <label for="defaultForm-name">Yetkili Adı</label>
+                                            <input type="text" name="OfficalName" class="form-control" placeholder="Ad">
+                                        </div>
+                                        <div class="col">
+                                            <label for="defaultForm-name">Yetkili Soyadı</label>
+                                            <input type="text" name="OfficalSurname" class="form-control" placeholder="Soyad">
+                                        </div>
+                                    </div>
+                                    <div class="row mb-2">
+                                        <label for="defaultForm-name">Yetkili Statüsü</label>
+                                        <div class="input-group col">
+                                            <div class="input-group-text">
+                                                <i class="bi bi-person">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-person" viewBox="0 0 16 16">
+                                                        <path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6Zm2-3a2 2 0 1 1-4 0 2 2 0 0 1 4 0Zm4 8c0 1-1 1-1 1H3s-1 0-1-1 1-4 6-4 6 3 6 4Zm-1-.004c-.001-.246-.154-.986-.832-1.664C11.516 10.68 10.289 10 8 10c-2.29 0-3.516.68-4.168 1.332-.678.678-.83 1.418-.832 1.664h10Z" />
+                                                    </svg>
+                                                </i>
+                                            </div>
+                                            <input type="text" name="OfficalTitle" class="form-control" id="inlineFormInputGroupUsername" placeholder="Statü">
+                                        </div>
+
+                                        <div class="input-group col">
+                                            <div class="input-group-text">
+                                                <i class="bi bi-telephone">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-telephone" viewBox="0 0 16 16">
+                                                        <path d="M3.654 1.328a.678.678 0 0 0-1.015-.063L1.605 2.3c-.483.484-.661 1.169-.45 1.77a17.568 17.568 0 0 0 4.168 6.608 17.569 17.569 0 0 0 6.608 4.168c.601.211 1.286.033 1.77-.45l1.034-1.034a.678.678 0 0 0-.063-1.015l-2.307-1.794a.678.678 0 0 0-.58-.122l-2.19.547a1.745 1.745 0 0 1-1.657-.459L5.482 8.062a1.745 1.745 0 0 1-.46-1.657l.548-2.19a.678.678 0 0 0-.122-.58L3.654 1.328zM1.884.511a1.745 1.745 0 0 1 2.612.163L6.29 2.98c.329.423.445.974.315 1.494l-.547 2.19a.678.678 0 0 0 .178.643l2.457 2.457a.678.678 0 0 0 .644.178l2.189-.547a1.745 1.745 0 0 1 1.494.315l2.306 1.794c.829.645.905 1.87.163 2.611l-1.034 1.034c-.74.74-1.846 1.065-2.877.702a18.634 18.634 0 0 1-7.01-4.42 18.634 18.634 0 0 1-4.42-7.009c-.362-1.03-.037-2.137.703-2.877L1.885.511z" />
+                                                    </svg>
+                                                </i>
+                                            </div>
+
+                                            <input type="text" name="OfficalPhone" class="form-control" id="inlineFormInputGroupUsername" placeholder="Telefon">
+                                        </div>
+
+                                    </div>
+                                    <div class="row mb-1">
+                                        <label for="defaultForm-name">Yetkili Mail</label>
+                                        <div class="col-6">
+                                            <label class="visually-hidden" for="inlineFormInputGroupUsername">Email</label>
+                                            <div class="input-group">
+                                                <div class="input-group-text">
+                                                    <i class="bi bi-envelope">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-envelope" viewBox="0 0 16 16">
+                                                            <path d="M0 4a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V4Zm2-1a1 1 0 0 0-1 1v.217l7 4.2 7-4.2V4a1 1 0 0 0-1-1H2Zm13 2.383-4.708 2.825L15 11.105V5.383Zm-.034 6.876-5.64-3.471L8 9.583l-1.326-.795-5.64 3.47A1 1 0 0 0 2 13h12a1 1 0 0 0 .966-.741ZM1 11.105l4.708-2.897L1 5.383v5.722Z" />
+                                                        </svg>
+                                                    </i>
+                                                </div>
+                                                <input type="text" name="OfficalEmail" class="form-control" id="inlineFormInputGroupUsername" placeholder="Email">
+                                            </div>
+                                        </div>
+                                        <div class="col-6">
+                                            <label class="visually-hidden" for="inlineFormInputGroupUsername">Durum</label>
+                                            <div class="input-group">
+                                                <select class="form-select" name="Condition" aria-label="Default select example">
+                                                    <option selected>--Durum--</option>
+                                                    <option value="True">Aktif</option>
+                                                    <option value="False">Pasif</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <br />
+                                    <div class="row">
+                                        <div class="col-12">
+                                            <div class="form-group">
+                                                <label for="exampleFormControlTextarea1">Adres</label>
+                                                <textarea class="form-control" name="OfficalAdress" id="exampleFormControlTextarea1" rows="6" placeholder="Meydan Kavağı Mahallesi,Değirmenönü Caddesi, Sıla Apartmanı 112/A, Muratpaşa,Antalya"></textarea>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="modal-footer md-button">
+
+                                <input type="submit" value="Güncelle" class="btn btn-primary" />
+                                <input type="reset" value="Temizle" class="btn btn-danger" />
+                            </div>
+                        </form>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+        <div class="middle-content container-xxl p-0">
+
+            <div class="col-lg-6">
+                <button type="button" class="btn btn-info mt-5 mr-0" data-bs-toggle="modal" data-bs-target="#rotateleftModal">Şirket Ekle</button>
+            </div>
+            <div class="row" id="cancel-row">
+
+                <div class="col-xl-12 col-lg-12 col-sm-12 layout-top-spacing layout-spacing">
+                    <div class="widget-content widget-content-area br-8">
+                        <table id="invoice-list" class="table dt-table-hover" style="width:100%">
+                            <thead>
+                                <tr>
+                                    <th></th>
+                                    <th>Şirket</th>
+                                    <th>Yetkili</th>
+                                    <th>Telefon</th>
+                                    <th>Mail</th>
+                                    <th>İl</th>
+                                    <th>Kayıt</th>
+                                    <th>Durum</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in Model)
+                                {
+                                    <tr>
+                                        <td><a href="./app-invoice-preview.html"><span class="inv-number">1</span></a></td>
+
+                                        <td>
+                                            <span class="inv-email">
+                                                <i class="bi bi-buildings">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-buildings" viewBox="0 0 16 16">
+                                                        <path d="M14.763.075A.5.5 0 0 1 15 .5v15a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5V14h-1v1.5a.5.5 0 0 1-.5.5h-9a.5.5 0 0 1-.5-.5V10a.5.5 0 0 1 .342-.474L6 7.64V4.5a.5.5 0 0 1 .276-.447l8-4a.5.5 0 0 1 .487.022ZM6 8.694 1 10.36V15h5V8.694ZM7 15h2v-1.5a.5.5 0 0 1 .5-.5h2a.5.5 0 0 1 .5.5V15h2V1.309l-7 3.5V15Z" />
+                                                        <path d="M2 11h1v1H2v-1Zm2 0h1v1H4v-1Zm-2 2h1v1H2v-1Zm2 0h1v1H4v-1Zm4-4h1v1H8V9Zm2 0h1v1h-1V9Zm-2 2h1v1H8v-1Zm2 0h1v1h-1v-1Zm2-2h1v1h-1V9Zm0 2h1v1h-1v-1ZM8 7h1v1H8V7Zm2 0h1v1h-1V7Zm2 0h1v1h-1V7ZM8 5h1v1H8V5Zm2 0h1v1h-1V5Zm2 0h1v1h-1V5Zm0-2h1v1h-1V3Z" />
+                                                    </svg>
+                                                </i>@item.CompanyName
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <div class="d-flex">
+                                                <div class="usr-img-frame me-2 rounded-circle">
+                                                    <img alt="avatar" class="img-fluid rounded-circle" src="/cork-v3.8.0/company.jpg">
+                                                </div>
+                                                <p class="align-self-center mb-0 user-name"> @item.OfficalName @item.OfficalSurname </p>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <span class="inv-email">
+                                                <i class="bi bi-phone-vibrate">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-phone-vibrate" viewBox="0 0 16 16">
+                                                        <path d="M10 3a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h4zM6 2a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h4a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H6z" />
+                                                        <path d="M8 12a1 1 0 1 0 0-2 1 1 0 0 0 0 2zM1.599 4.058a.5.5 0 0 1 .208.676A6.967 6.967 0 0 0 1 8c0 1.18.292 2.292.807 3.266a.5.5 0 0 1-.884.468A7.968 7.968 0 0 1 0 8c0-1.347.334-2.619.923-3.734a.5.5 0 0 1 .676-.208zm12.802 0a.5.5 0 0 1 .676.208A7.967 7.967 0 0 1 16 8a7.967 7.967 0 0 1-.923 3.734.5.5 0 0 1-.884-.468A6.967 6.967 0 0 0 15 8c0-1.18-.292-2.292-.807-3.266a.5.5 0 0 1 .208-.676zM3.057 5.534a.5.5 0 0 1 .284.648A4.986 4.986 0 0 0 3 8c0 .642.12 1.255.34 1.818a.5.5 0 1 1-.93.364A5.986 5.986 0 0 1 2 8c0-.769.145-1.505.41-2.182a.5.5 0 0 1 .647-.284zm9.886 0a.5.5 0 0 1 .648.284C13.855 6.495 14 7.231 14 8c0 .769-.145 1.505-.41 2.182a.5.5 0 0 1-.93-.364C12.88 9.255 13 8.642 13 8c0-.642-.12-1.255-.34-1.818a.5.5 0 0 1 .283-.648z" />
+                                                    </svg>
+                                                </i>
+                                                @item.CompanyPhone
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <span class="inv-email">
+                                                <i class="bi bi-envelope-at">
+
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-envelope-at" viewBox="0 0 16 16">
+                                                        <path d="M2 2a2 2 0 0 0-2 2v8.01A2 2 0 0 0 2 14h5.5a.5.5 0 0 0 0-1H2a1 1 0 0 1-.966-.741l5.64-3.471L8 9.583l7-4.2V8.5a.5.5 0 0 0 1 0V4a2 2 0 0 0-2-2H2Zm3.708 6.208L1 11.105V5.383l4.708 2.825ZM1 4.217V4a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v.217l-7 4.2-7-4.2Z" />
+                                                        <path d="M14.247 14.269c1.01 0 1.587-.857 1.587-2.025v-.21C15.834 10.43 14.64 9 12.52 9h-.035C10.42 9 9 10.36 9 12.432v.214C9 14.82 10.438 16 12.358 16h.044c.594 0 1.018-.074 1.237-.175v-.73c-.245.11-.673.18-1.18.18h-.044c-1.334 0-2.571-.788-2.571-2.655v-.157c0-1.657 1.058-2.724 2.64-2.724h.04c1.535 0 2.484 1.05 2.484 2.326v.118c0 .975-.324 1.39-.639 1.39-.232 0-.41-.148-.41-.42v-2.19h-.906v.569h-.03c-.084-.298-.368-.63-.954-.63-.778 0-1.259.555-1.259 1.4v.528c0 .892.49 1.434 1.26 1.434.471 0 .896-.227 1.014-.643h.043c.118.42.617.648 1.12.648Zm-2.453-1.588v-.227c0-.546.227-.791.573-.791.297 0 .572.192.572.708v.367c0 .573-.253.744-.564.744-.354 0-.581-.215-.581-.8Z" />
+                                                    </svg>
+                                                </i>@item.OfficalEmail
+                                            </span>
+                                        </td>
+
+
+                                        <td><span class="inv-amount">@item.CompanyCity</span></td>
+                                        <td><span class="inv-date"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-calendar"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>@DateTime.Parse(item.CreatedDate.ToString()).ToString("dd MMM")</span></td>
+                                        @if (item.Condition == true)
+                                        {
+                                            <td><span class="badge badge-light-success inv-status">Aktif</span></td>
+                                        }
+                                        else
+                                        {
+                                            <td><span class="badge badge-light-danger inv-status">Pasif</span></td>
+                                        }
+
+                                        <td>
+                                            <a class="badge btnGetWhere badge-light-primary text-start me-2 action-edit" data-id="@item.Id" data-bs-toggle="modal" data-bs-target="#studentdetail" href="javascript:void(0);">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-edit-3">
+                                                    <path d="M12 20h9"></path>
+                                                    <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
+                                                </svg>
+                                            </a>
+                                            <a class="badge badge-light-danger text-start action-delete" href="/Company/Delete/@item.Id"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-trash"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg></a>
+
+                                        </td>
+                                    </tr>
+                                }
+
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!--  BEGIN FOOTER  -->
+    <div class="footer-wrapper mt-0">
+        <div class="footer-section f-section-1">
+            <p class="">Copyright © <span class="dynamic-year">2022</span> <a target="_blank" href="https://designreset.com/cork-admin/">DesignReset</a>, All rights reserved.</p>
+        </div>
+        <div class="footer-section f-section-2">
+            <p class="">Coded with <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-heart"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg></p>
+        </div>
+    </div>
+    <!--  END FOOTER  -->
+</div>

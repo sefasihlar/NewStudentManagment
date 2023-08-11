@@ -1,0 +1,86 @@
+﻿@using NLayer.Core.DTOs.PaymentDtos
+@model List<GetWithStudentListDto>
+@{
+    int id = 1;
+    decimal TotalPrice = 0;
+    decimal TotalUnpaid = 0;
+}
+    <div class="inv--product-table-section">
+        <div class="table-responsive">
+            <table class="table">
+                <thead class="">
+                    <tr>
+                        <th scope="col">S.No</th>
+                        <th scope="col">Ad-Soyad</th>
+                        <th class="text-end" scope="col">Yöntem</th>
+                        <th class="text-end" scope="col">Durum</th>
+                        <th class="text-end" scope="col">Miktar</th>
+                        <th class="text-end" scope="col">Tarih</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>@id</td>
+                        <td>@item.Student.GuardianName @item.Student.GuardianSurName</td>
+                        <td class="text-end">@item.PaymentMethod</td>
+                        <td class="text-end">@item.PaymentStatus</td>
+                        <td class="text-end">@item.Amount ₺</td>
+                        <td class="text-end">
+                            <span class="inv-date">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-calendar">
+                                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                                    <line x1="16" y1="2" x2="16" y2="6"></line>
+                                    <line x1="8" y1="2" x2="8" y2="6"></line>
+                                    <line x1="3" y1="10" x2="21" y2="10"></line>
+                                </svg>
+                                @DateTime.Parse(item.PaymentDate.ToString()).ToString("dd MMM yyyy")
+                            </span>
+                        </td>
+                        
+                    </tr>
+
+
+                    if (item.PaymentStatus=="Ödendi")
+                    {
+                        TotalPrice += item.Amount;
+                    }
+                    else
+                    {
+                        TotalUnpaid += item.Amount;
+                    }
+                   
+                    id++;
+                }
+                  
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="inv--total-amounts">
+
+        <div class="row mt-4">
+            <div class="col-sm-5 col-12 order-sm-0 order-1">
+            </div>
+            <div class="col-sm-7 col-12 order-sm-1 order-0">
+                <div class="text-sm-end">
+                    <div class="row">
+                        <div class="col-sm-8 col-7">
+                            <p class="">Ödenen Toplam Tutar :</p>
+                        </div>
+                        <div class="col-sm-4 col-5">
+                            <p class="" style="color:green">@TotalPrice ₺</p>
+                        </div>
+                        <div class="col-sm-8 col-7">
+                            <p class="">Ödenecek Miktar:</p>
+                        </div>
+                        <div class="col-sm-4 col-5">
+                            <p class="" style="color:red">@TotalUnpaid ₺</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>

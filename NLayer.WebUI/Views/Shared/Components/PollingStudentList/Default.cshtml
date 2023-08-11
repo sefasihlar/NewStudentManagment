@@ -1,0 +1,54 @@
+﻿@model NLayer.Core.Concreate.Polling
+@{
+   
+    decimal TotalPrice = 0;
+    decimal TotalUnpaid = 0;
+}
+<div class="inv--product-table-section">
+    <div class="table-responsive">
+        <table class="table">
+            <thead class="">
+                <tr>
+                    <th scope="col">S.No</th>
+                    <th scope="col">Ad-Soyad</th>
+                    <th class="text-end" scope="col">Veli-Ad-Soyad</th>
+                    <th class="text-end" scope="col">Veli-Telefon</th>
+                    <th class="text-end" scope="col">Tarih</th>
+                </tr>
+            </thead>
+            <tbody>
+               
+                @foreach (var item in Model.StudentPollings)
+                {
+                    <td>@item.Student.Name  @item.Student.SurName</td>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="inv--total-amounts">
+
+    <div class="row mt-4">
+        <div class="col-sm-5 col-12 order-sm-0 order-1">
+        </div>
+        <div class="col-sm-7 col-12 order-sm-1 order-0">
+            <div class="text-sm-end">
+                <div class="row">
+                    <div class="col-sm-8 col-7">
+                        <p class="">Ödenen Toplam Tutar :</p>
+                    </div>
+                    <div class="col-sm-4 col-5">
+                        <p class="" style="color:green">@TotalPrice ₺</p>
+                    </div>
+                    <div class="col-sm-8 col-7">
+                        <p class="">Ödenecek Miktar:</p>
+                    </div>
+                    <div class="col-sm-4 col-5">
+                        <p class="" style="color:red">@TotalUnpaid ₺</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,135 @@
+﻿@section Scripts {
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $('.action-btn.btn-edit').click(function () {
+                var id = $(this).attr('itemid'); // itemid özelliğini al
+
+                $.ajax({
+                    url: 'https://kursdefteri.com.tr/api/?id=' + id,
+                    type: 'GET',
+                    dataType: 'json',
+                    beforeSend: function () {
+                        // AJAX isteği gönderilmeden önce yapılacak işlemler
+                        // Örneğin, uyarı mesajını temizleme veya görünür hale getirme
+                        $('.alert').hide();
+                    },
+                    console.log("ajax calisti");
+                    success: function (data) {
+                        // Veri başarıyla alındığında yapılacak işlemler
+                        // Örneğin, veriyi kullanarak modal içeriğini doldurabilirsiniz
+
+                        // Popup açma işlemi
+                        $('#rotateleftModal').modal('show');
+
+                        // Uyarı mesajı gösterme
+                        $('.alert').text('AJAX isteği başarıyla tamamlandı.').show();
+                    },
+                    error: function (xhr, status, error) {
+                        // Hata durumunda yapılacak işlemler
+                        // Örneğin, hata mesajını görüntüleme veya gizleme
+                        $('.alert').text('AJAX isteği başarısız oldu.').show();
+                    }
+                });
+            });
+        });
+    </script>
+}
+
+
+<div id="rotateleftModal" class="modal animated rotateInDownLeft custo-rotateInDownLeft" role="dialog">
+    <div class="modal-dialog modal-lg">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Sınıf Kayıt</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+                    <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-x"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form asp-controller="Class" asp-action="Create" method="post" enctype="multipart/form-data">
+                    <div class="row mb-4">
+                        <div class="col-6">
+                            <input type="text" name="Name" class="form-control" placeholder="Sınınf Adı">
+                        </div>
+                        <div class="col-6">
+                            <input type="text" Name="WeekCount" class="form-control" placeholder="Kaç Hafta">
+                        </div>
+
+                        <br />
+
+                    </div>
+                    <div class="row mb-4">
+                        <div class="col-6">
+                            <select class="form-select" name="Condition" aria-label="Default select example">
+                                <option value="True">Aktif</option>
+                                <option value="False">Pasif</option>
+                            </select>
+                        </div>
+                        <div class="col-6">
+                            <input type="file" name="file" class="form-control" placeholder="Resim Seç">
+                        </div>
+                    </div>
+
+                    <br />
+                    <div class="col-12">
+                        <div class="form-check form-check-primary form-check-inline">
+                            <input class="form-check-input" type="checkbox" name="DayIds" value="1" id="form-check-primary" checked="">
+                            <label class="form-check-label" for="form-check-primary">
+                                Pazartesi
+                            </label>
+                        </div>
+
+                        <div class="form-check form-check-info form-check-inline">
+                            <input class="form-check-input" type="checkbox" name="DayIds" value="2" id="form-check-info" checked="">
+                            <label class="form-check-label" for="form-check-info">
+                                Salı
+                            </label>
+                        </div>
+
+                        <div class="form-check form-check-success form-check-inline">
+                            <input class="form-check-input" type="checkbox" name="DayIds" value="3" id="form-check-success" checked="">
+                            <label class="form-check-label" for="form-check-success">
+                                Çarşamba
+                            </label>
+                        </div>
+
+                        <div class="form-check form-check-danger form-check-inline">
+                            <input class="form-check-input" type="checkbox" name="DayIds" value="4" id="form-check-danger" checked="">
+                            <label class="form-check-label" for="form-check-danger">
+                                Perşembe
+                            </label>
+                        </div>
+
+                        <div class="form-check form-check-secondary form-check-inline">
+                            <input class="form-check-input" type="checkbox" name="DayIds" value="5" id="form-check-secondary" checked="">
+                            <label class="form-check-label" for="form-check-secondary">
+                                Cuma
+                            </label>
+                        </div>
+
+                        <div class="form-check form-check-warning form-check-inline">
+                            <input class="form-check-input" type="checkbox" name="DayIds" value="6" id="form-check-warning" checked="">
+                            <label class="form-check-label" for="form-check-warning">
+                                Cumartesi
+                            </label>
+                        </div>
+
+                        <div class="form-check form-check-dark form-check-inline">
+                            <input class="form-check-input" type="checkbox" name="DayIds" value="7" id="form-check-dark" checked="">
+                            <label class="form-check-label" for="form-check-dark">
+                                Pazar
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="modal-footer md-button">
+                        <button type="submit" class="btn btn-primary">Kaydet</button>
+                    </div>
+                </form>
+            </div>
+
+        </div>
+    </div>
+</div>

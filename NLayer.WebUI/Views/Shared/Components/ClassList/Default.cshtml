@@ -1,0 +1,10 @@
+﻿@using NLayer.Core.DTOs.ClassDtos
+@model List<ClassDto>
+
+<select class="form-select" name="ClassId" aria-label="Default select example">
+    <option selected>--Sınıf Seç--</option>
+    @foreach (var item in Model)
+    {
+        <option value="@item.Id">@item.Name</option>
+    }
+</select>

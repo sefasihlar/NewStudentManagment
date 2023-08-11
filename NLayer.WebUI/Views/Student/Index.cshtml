@@ -1,0 +1,338 @@
+﻿@using NLayer.Core.DTOs.StudentDtos
+@model List<GetWithClassListDto>
+
+
+@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section Scripts{
+    <script src="~/jquery/jquery/jquery.min.js"></script>
+    <script>
+        $(".btnGetWhere").click(function () {
+            var id = $(this).data("id");
+
+            $.ajax({
+                contentType: "application/json",
+                dataType: "json",
+                type: "GET",
+                url: "/Student/GetStudentById",
+                data: { id: id },
+                success: function (response) {
+                    response = JSON.parse(response); // JSON dizesini nesneye dönüştür
+
+                    console.log(response);
+                    // Form inputlarını doldurma işlemi
+                    var formValues = [
+                        { name: "StudentIdentity", value: response.StudentIdentity },
+                        { name: "Id", value: response.Id },
+                        { name: "Name", value: response.Name },
+                        { name: "SurName", value: response.SurName },
+                        { name: "SchoolClass", value: response.SchoolClass },
+                        { name: "School", value: response.School },
+                        { name: "Price", value: response.Price },
+                        { name: "GuardianIdentity", value: response.GuardianIdentity },
+                        { name: "GuardianName", value: response.GuardianName },
+                        { name: "GuardianSurName", value: response.GuardianSurName },
+                        { name: "GuardianJob", value: response.GuardianJob },
+                        { name: "GuardianEmail", value: response.GuardianEmail },
+                        { name: "GuardianPhone", value: response.GuardianPhone },
+                        { name: "Adress", value: response.Adress },
+                    ];
+
+                    formValues.forEach(function (item) {
+                        $('input[name="' + item.name + '"]').val(item.value);
+                        $('textarea[name="' + item.name + '"]').val(item.value);
+                      
+                    });
+                },
+                error: function (xhr) {
+                    alert("Bir hata oluştu: " + xhr.status + " " + xhr.statusText);
+                },
+            });
+        });
+
+
+
+    </script>
+}
+
+<div id="studentdetail" class="modal animated zoomInUp custo-zoomInUp" role="dialog">
+    <div class="modal-dialog modal-xl">
+        <!-- Modal content-->
+        <div class="modal-content ">
+            <div class="modal-header">
+                <h5 class="modal-title">Öğrenci Detay</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+                    <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-x"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                </button>
+            </div>
+            <div class="modal-body">
+               <form asp-controller="Student" asp-action="Update" method="post">
+                   <input  type="hidden" name="Id" />
+
+                    <div class="row">
+
+                        <div class="col-6">
+                            <h3><strong class="text-center">Öğrenci</strong></h3>
+                            <div class="row mb-12">
+                                <div class="col">
+                                    <input type="text" name="StudentIdentity" class="form-control" placeholder="TC Kimlik Numarası">
+                                </div>
+                            </div>
+                            <br />
+                            <div class="row mb-4">
+                                <div class="col">
+                                    <input type="text" name="Name" class="form-control" placeholder="Ad">
+                                </div>
+                                <div class="col">
+                                    <input type="text" name="SurName" class="form-control" placeholder="Soyad">
+                                </div>
+                            </div>
+                            <div class="row mb-4">
+                                <div class="col">
+                                    <input type="text" name="SchoolClass" class="form-control" placeholder="Sınıf">
+                                </div>
+                                <div class="input-group col">
+                                    <div class="input-group-text">
+                                        <i class="bi bi-house-door">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-house-door" viewBox="0 0 16 16">
+                                                <path d="M8.354 1.146a.5.5 0 0 0-.708 0l-6 6A.5.5 0 0 0 1.5 7.5v7a.5.5 0 0 0 .5.5h4.5a.5.5 0 0 0 .5-.5v-4h2v4a.5.5 0 0 0 .5.5H14a.5.5 0 0 0 .5-.5v-7a.5.5 0 0 0-.146-.354L13 5.793V2.5a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5v1.293L8.354 1.146ZM2.5 14V7.707l5.5-5.5 5.5 5.5V14H10v-4a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5v4H2.5Z" />
+                                            </svg>
+                                        </i>
+                                    </div>
+                                    <input type="text" class="form-control" name="School" id="inlineFormInputGroupUsername" placeholder="Okul">
+                                </div>
+                            </div>
+                            <div class="row mb-4 ">
+                                <div class="col">
+                                    @await Component.InvokeAsync("ClassList")
+                                </div>
+
+                                <div class="col">
+                                    <select class="form-select" name="Gender" aria-label="Default select example">
+                                        <option selected>--Cinsiyet--</option>
+                                        <option value="True">Erkek</option>
+                                        <option value="False">Kız</option>
+                                    </select>
+                                </div>
+
+                            </div>
+                            <br />
+                            <h3><strong class="text-center">Kayıt Ödeme</strong></h3>
+                            <div class="row mb-12">
+                                <div class="col">
+                                    <input type="text" name="Price" class="form-control" placeholder="Aylık fiyat">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-6">
+                            <h3><strong class="text-center">Veli</strong></h3>
+                            <div class="row mb-12">
+                                <div class="col">
+                                    <input type="text" name="GuardianIdentity" class="form-control" placeholder="TC Kimlik Numarası">
+                                </div>
+                            </div>
+                            <br />
+                            <div class="row mb-4">
+                                <div class="col">
+                                    <input type="text" name="GuardianName" class="form-control" placeholder="Ad">
+                                </div>
+                                <div class="col">
+                                    <input type="text" name="GuardianSurName" class="form-control" placeholder="Soyad">
+                                </div>
+                            </div>
+                            <div class="row mb-4">
+                                <div class="input-group col">
+                                    <div class="input-group-text">
+                                        <i class="bi bi-person">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-person" viewBox="0 0 16 16">
+                                                <path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6Zm2-3a2 2 0 1 1-4 0 2 2 0 0 1 4 0Zm4 8c0 1-1 1-1 1H3s-1 0-1-1 1-4 6-4 6 3 6 4Zm-1-.004c-.001-.246-.154-.986-.832-1.664C11.516 10.68 10.289 10 8 10c-2.29 0-3.516.68-4.168 1.332-.678.678-.83 1.418-.832 1.664h10Z" />
+                                            </svg>
+                                        </i>
+                                    </div>
+                                    <input type="text" name="GuardianJob" class="form-control" id="inlineFormInputGroupUsername" placeholder="Mesleği">
+                                </div>
+                                <div class="input-group col">
+                                    <div class="input-group-text">
+                                        <i class="bi bi-telephone">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-telephone" viewBox="0 0 16 16">
+                                                <path d="M3.654 1.328a.678.678 0 0 0-1.015-.063L1.605 2.3c-.483.484-.661 1.169-.45 1.77a17.568 17.568 0 0 0 4.168 6.608 17.569 17.569 0 0 0 6.608 4.168c.601.211 1.286.033 1.77-.45l1.034-1.034a.678.678 0 0 0-.063-1.015l-2.307-1.794a.678.678 0 0 0-.58-.122l-2.19.547a1.745 1.745 0 0 1-1.657-.459L5.482 8.062a1.745 1.745 0 0 1-.46-1.657l.548-2.19a.678.678 0 0 0-.122-.58L3.654 1.328zM1.884.511a1.745 1.745 0 0 1 2.612.163L6.29 2.98c.329.423.445.974.315 1.494l-.547 2.19a.678.678 0 0 0 .178.643l2.457 2.457a.678.678 0 0 0 .644.178l2.189-.547a1.745 1.745 0 0 1 1.494.315l2.306 1.794c.829.645.905 1.87.163 2.611l-1.034 1.034c-.74.74-1.846 1.065-2.877.702a18.634 18.634 0 0 1-7.01-4.42 18.634 18.634 0 0 1-4.42-7.009c-.362-1.03-.037-2.137.703-2.877L1.885.511z" />
+                                            </svg>
+                                        </i>
+                                    </div>
+                                    <input type="text" name="GuardianPhone" class="form-control" id="inlineFormInputGroupUsername" placeholder="Telefon">
+                                </div>
+
+                            </div>
+                            <div class="row mb-4">
+                            <div class="col-6">
+                                <label class="visually-hidden"  for="inlineFormInputGroupUsername">Email</label>
+                                <div class="input-group">
+                                    <div class="input-group-text">
+                                        <i class="bi bi-envelope">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-envelope" viewBox="0 0 16 16">
+                                                <path d="M0 4a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V4Zm2-1a1 1 0 0 0-1 1v.217l7 4.2 7-4.2V4a1 1 0 0 0-1-1H2Zm13 2.383-4.708 2.825L15 11.105V5.383Zm-.034 6.876-5.64-3.471L8 9.583l-1.326-.795-5.64 3.47A1 1 0 0 0 2 13h12a1 1 0 0 0 .966-.741ZM1 11.105l4.708-2.897L1 5.383v5.722Z" />
+                                            </svg>
+                                        </i>
+                                    </div>
+                                    <input type="text" name="GuardianEmail" class="form-control" id="inlineFormInputGroupUsername" placeholder="Email">
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <label class="visually-hidden" for="inlineFormInputGroupUsername">Durum</label>
+                                <div class="input-group">
+                                    <select class="form-select" name="Condition" aria-label="Default select example">
+                                        <option selected>--Durum--</option>
+                                        <option value="True">Aktif</option>
+                                        <option value="False">Pasif</option>
+                                    </select>
+                                </div>
+                            </div>
+                            </div>
+                            <br />
+                            <div class="row mb-4">
+                                <div class="col-12">
+                                    <div class="form-group">
+                                        <label for="exampleFormControlTextarea1">Adres</label>
+                                        <textarea class="form-control" name="Adress" id="exampleFormControlTextarea1" rows="3"></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="modal-footer md-button">
+
+                        <input type="submit" value="Güncelle" class="btn btn-primary" />
+                        <input type="reset" value="Temizle" class="btn btn-danger" />
+                    </div>
+                </form>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<div id="content" class="main-content">
+    <div class="layout-px-spacing"> 
+        @await Component.InvokeAsync("StudentDetail")
+        @await Component.InvokeAsync("StudentCreate")
+
+        <div class="middle-content container-xxl p-0">
+            <div class="col-lg-6">
+                <!-- Zoom in up modal -->
+                <button type="button" class="btn btn-primary mt-5 mr-2" data-bs-toggle="modal" data-bs-target="#zoomupModal">Öğrenci Kaydet</button>
+            </div>
+            <div class="row" id="cancel-row">
+
+                <div class="col-xl-12 col-lg-12 col-sm-12 layout-top-spacing layout-spacing">
+                    <div class="widget-content widget-content-area br-8">
+                        <table id="invoice-list" class="table dt-table-hover" style="width:100%">
+                            <thead>
+                                <tr>
+                                    <th>TCKN</th>
+                                    <th>Öğrenci</th>
+                                    <th>Sınıf</th>
+                                    <th>Veli-Mail</th>
+
+                                    <th>Kayıt Ücreti</th>
+                                    <th>Kayıt-Tarihi</th>
+                                    <th>Durum</th>
+                                    <th>İşlem</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in Model)
+                                {
+
+                                    <tr>
+                                        <td><a href="./app-invoice-preview.html"><span class="inv-number">@item.StudentIdentity</span></a></td>
+                                        @if (item.Gender==true)
+                                        {
+                                            <td>
+                                                <div class="d-flex">
+                                                    <div class="usr-img-frame me-2 rounded-circle">
+                                                        <img alt="avatar" class="img-fluid rounded-circle" src="/cork-v3.8.0/boy-student.jpg">
+                                                    </div>
+                                                    <p class="align-self-center mb-0 user-name"> @item.Name @item.SurName </p>
+                                                </div>
+                                            </td>
+                                        }
+                                        else
+                                        {
+                                            <td>
+                                                <div class="d-flex">
+                                                    <div class="usr-img-frame me-2 rounded-circle">
+                                                        <img alt="avatar" class="img-fluid rounded-circle" src="/cork-v3.8.0/Girl-İcon.png">
+                                                    </div>
+                                                    <p class="align-self-center mb-0 user-name"> @item.Name @item.SurName </p>
+                                                </div>
+                                            </td>
+                                        }
+
+                                        <td>
+                                            <div class="d-flex">
+                                                <div class="usr-img-frame me-2 rounded-circle">
+                                                    <img alt="avatar" class="img-fluid rounded-circle" src="/cork-v3.8.0/Class-Foto/@item.Class.ImageUrl">
+                                                </div>
+                                                <p class="align-self-center mb-0 user-name">@item.Class.Name</p>
+                                            </div>
+                                        <td><span class="inv-email"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-mail"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>@item.GuardianEmail</span></td>
+
+                                        <td><span class="inv-amount">@item.Price ₺</span></td>
+                                        <td>
+                                            <span class="inv-date">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-calendar">
+                                                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                                                    <line x1="16" y1="2" x2="16" y2="6"></line>
+                                                    <line x1="8" y1="2" x2="8" y2="6"></line>
+                                                    <line x1="3" y1="10" x2="21" y2="10"></line>
+                                                </svg>
+                                                @DateTime.Parse(item.CreatedDate.ToString()).ToString("dd MMM")
+                                            </span>
+                                        </td>
+
+                                        @if (item.Condition == true)
+                                        {
+                                            <td><span class="badge badge-light-success inv-status">Aktif</span></td>
+                                        }
+
+                                        else
+                                        {
+                                            <td><span class="badge badge-light-danger inv-status">Pasif</span></td>
+                                        }
+
+                                        <td>
+                                            <a class="badge btnGetWhere badge-light-primary text-start me-2 action-edit" data-id="@item.Id" data-bs-toggle="modal" data-bs-target="#studentdetail" href="javascript:void(0);">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-edit-3">
+                                                    <path d="M12 20h9"></path>
+                                                    <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
+                                                </svg>
+                                            </a>
+                                            <a class="badge badge-light-danger text-start action-delete" href="/Student/Delete/@item.Id"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-trash"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg></a>
+                                        </td>
+                                    </tr>
+                                }
+
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--  BEGIN FOOTER  -->
+    <div class="footer-wrapper mt-0">
+        <div class="footer-section f-section-1">
+            <p class="">Copyright © <span class="dynamic-year">2022</span> <a target="_blank" href="https://designreset.com/cork-admin/">DesignReset</a>, All rights reserved.</p>
+        </div>
+        <div class="footer-section f-section-2">
+            <p class="">Coded with <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-heart"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg></p>
+        </div>
+    </div>
+    <!--  END FOOTER  -->
+</div>
+

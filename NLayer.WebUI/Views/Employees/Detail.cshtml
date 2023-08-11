@@ -1,0 +1,710 @@
+﻿@using NLayer.Core.DTOs.EmployeesDtos
+@model EmployeesDto
+
+@{
+    ViewData["Title"] = "Detail";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section Scripts{
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+    <script src="~/jquery/jquery/jquery.min.js"></script>
+    <script>
+        var btnUpload = $("#upload_file"),
+            btnOuter = $(".button_outer");
+        btnUpload.on("change", function (e) {
+            var ext = btnUpload.val().split('.').pop().toLowerCase();
+            var img = new Image();
+            img.src = URL.createObjectURL(e.target.files[0]);
+            img.onload = function () {
+                var width = img.width;
+                var height = img.height;
+                if (width > 91 || height > 91) {
+                    $(".error_msg").text("Resim boyutu 90x90 pikselden büyük olamaz.");
+                    $("#uploaded_view").removeClass("show");
+                    $("#uploaded_view").find("img").remove();
+                    btnOuter.removeClass("file_uploading");
+                    btnOuter.removeClass("file_uploaded");
+                } else if ($.inArray(ext, ['gif', 'png', 'jpg', 'jpeg']) == -1) {
+                    $(".error_msg").text("Geçerli bir resim dosyası yükleyiniz (gif, png, jpg, jpeg).");
+                    $("#uploaded_view").removeClass("show");
+                    $("#uploaded_view").find("img").remove();
+                    btnOuter.removeClass("file_uploading");
+                    btnOuter.removeClass("file_uploaded");
+                } else {
+                    $(".error_msg").text("");
+                    btnOuter.addClass("file_uploading");
+                    setTimeout(function () {
+                        btnOuter.addClass("file_uploaded");
+                    }, 3000);
+                    var uploadedFile = URL.createObjectURL(e.target.files[0]);
+                    setTimeout(function () {
+                        $("#uploaded_view").append('<img src="' + uploadedFile + '" />').addClass("show");
+                    }, 3500);
+                }
+            };
+        });
+        $(".file_remove").on("click", function (e) {
+            $("#uploaded_view").removeClass("show");
+            $("#uploaded_view").find("img").remove();
+            btnOuter.removeClass("file_uploading");
+            btnOuter.removeClass("file_uploaded");
+        });
+    </script>
+    <script>
+        function detailajax(element) {
+            var id = $(element).attr('data-id');
+            console.log(id);
+
+            $.ajax({
+                contentType: "application/json",
+                dataType: "json",
+                type: 'GET',
+                url: '/Employees/GetEmployeeById/' + id,
+                success: function (response) {
+                    // Dönen sonucu işleyin ve alanları doldurun
+                    var employee = JSON.parse(response); // JSON dizesini nesneye dönüştür
+
+                    console.log(employee);
+                    // Form inputlarını doldurma işlemi
+                    var formValues = [
+                        { name: "TCKN", value: employee.TCKN },
+                        { name: "Name", value: employee.Name },
+                        { name: "Surname", value: employee.Surname },
+                        { name: "Email", value: employee.Email },
+                        { name: "Phone", value: employee.Phone },
+                        { name: "Salary", value: employee.Salary },
+                        { name: "Location", value: employee.Location },
+                        { name: "Mother", value: employee.Mother },
+                        { name: "Father", value: employee.Father },
+                        { name: "UrgentPerson", value: employee.UrgentPerson },
+                        { name: "UrgentPhone", value: employee.UrgentPhone },
+                        { name: "Address", value: employee.Address },
+                        { name: "File", value: employee.File },
+                        { name: "Iban", value: employee.Iban }
+                    ];
+
+                    formValues.forEach(function (item) {
+                        $('input[name="' + item.name + '"]').val(item.value);
+                        $('textarea[name="' + item.name + '"]').val(item.value);
+                    });
+                },
+                error: function (xhr, status, error) {
+                    console.log("Hata:", error);
+                }
+            });
+        }
+
+        $('#kaydetButton').click(function () {
+            location.reload();
+        });
+    </script>
+}
+
+<div id="addContactModal" class="modal animated zoomInUp custo-zoomInUp" role="dialog">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title add-title" onclick="performDetailAjax(this)" id="addContactModalTitleLabel1">Profil Detay</h5>
+                <h5 class="modal-title edit-title" id="addContactModalTitleLabel2" style="display: none;">Profili Güncelle</h5>
+            </div>
+            <div class="modal-body">
+                <div class="add-contact-box">
+                    <div class="add-contact-content">
+
+                        <form asp-controller="Employees" asp-action="Update" method="post" enctype="multipart/form-data">
+                            <main class="main_full">
+                                <div class="container">
+                                    <div class="panel">
+                                        <div class="button_outer">
+                                            <div class="btn_upload">
+                                                <input type="file" id="upload_file" name="file">
+                                                Profil Resmini Değiştir
+                                            </div>
+                                            <div class="processing_bar"></div>
+                                            <div class="success_box"></div>
+                                        </div>
+                                    </div>
+                                    <div class="error_msg"></div>
+                                    <div class="uploaded_file_view" id="uploaded_view">
+                                        <span class="file_remove">X</span>
+                                    </div>
+                                </div>
+                            </main>
+
+                            <input type="hidden" name="Id" value="@Model.Id" />
+                            <br />
+                            <div class="row">
+                                <div class="col-6">
+                                    <h4><strong class="text-center">Çalışan Bilgileri</strong></h4>
+                                    <div class="col">
+                                        <input type="text" name="TCKN" class="form-control" placeholder="TC Kimlik Numarası">
+                                    </div>
+                                    <br />
+                                    <div class="row mb-2">
+                                        <div class="col">
+                                            <input type="text" name="Name" class="form-control" placeholder="Ad">
+                                        </div>
+                                        <div class="col">
+                                            <input type="text" name="Surname" class="form-control" placeholder="Soyad">
+                                        </div>
+                                    </div>
+                                    <div class="row mb-2">
+                                        <h3><strong class="text-center"></strong></h3>
+                                        <div class="col">
+                                            <label class="visually-hidden" for="inlineFormInputGroupUsername">Email</label>
+                                            <div class="input-group">
+                                                <div class="input-group-text">
+                                                    <i class="bi bi-envelope">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-envelope" viewBox="0 0 16 16">
+                                                            <path d="M0 4a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V4Zm2-1a1 1 0 0 0-1 1v.217l7 4.2 7-4.2V4a1 1 0 0 0-1-1H2Zm13 2.383-4.708 2.825L15 11.105V5.383Zm-.034 6.876-5.64-3.471L8 9.583l-1.326-.795-5.64 3.47A1 1 0 0 0 2 13h12a1 1 0 0 0 .966-.741ZM1 11.105l4.708-2.897L1 5.383v5.722Z" />
+                                                        </svg>
+                                                    </i>
+                                                </div>
+                                                <input type="text" name="Email" class="form-control" id="inlineFormInputGroupUsername" placeholder="Email">
+                                            </div>
+                                        </div>
+                                        <div class="input-group col mb-2">
+                                            <div class="input-group-text">
+                                                <i class="bi bi-telephone">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-telephone" viewBox="0 0 16 16">
+                                                        <path d="M3.654 1.328a.678.678 0 0 0-1.015-.063L1.605 2.3c-.483.484-.661 1.169-.45 1.77a17.568 17.568 0 0 0 4.168 6.608 17.569 17.569 0 0 0 6.608 4.168c.601.211 1.286.033 1.77-.45l1.034-1.034a.678.678 0 0 0-.063-1.015l-2.307-1.794a.678.678 0 0 0-.58-.122l-2.19.547a1.745 1.745 0 0 1-1.657-.459L5.482 8.062a1.745 1.745 0 0 1-.46-1.657l.548-2.19a.678.678 0 0 0-.122-.58L3.654 1.328zM1.884.511a1.745 1.745 0 0 1 2.612.163L6.29 2.98c.329.423.445.974.315 1.494l-.547 2.19a.678.678 0 0 0 .178.643l2.457 2.457a.678.678 0 0 0 .644.178l2.189-.547a1.745 1.745 0 0 1 1.494.315l2.306 1.794c.829.645.905 1.87.163 2.611l-1.034 1.034c-.74.74-1.846 1.065-2.877.702a18.634 18.634 0 0 1-7.01-4.42 18.634 18.634 0 0 1-4.42-7.009c-.362-1.03-.037-2.137.703-2.877L1.885.511z" />
+                                                    </svg>
+                                                </i>
+                                            </div>
+                                            <input type="text" name="Phone" class="form-control" id="inlineFormInputGroupUsername" placeholder="Telefon">
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-6">
+                                            <div class="input-group col-6">
+                                                <div class="input-group-text">
+                                                    ₺
+                                                </div>
+                                                <input type="text" name="Salary" class="form-control" id="inlineFormInputGroupUsername" placeholder="Aylık Ücret">
+                                            </div>
+                                        </div>
+                                        <div class="col-6">
+                                            <div class="input-group col-6">
+                                                <div class="input-group-text">
+                                                    <i class="bi bi-bank">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-bank" viewBox="0 0 16 16">
+                                                            <path d="m8 0 6.61 3h.89a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-.5.5H15v7a.5.5 0 0 1 .485.38l.5 2a.498.498 0 0 1-.485.62H.5a.498.498 0 0 1-.485-.62l.5-2A.501.501 0 0 1 1 13V6H.5a.5.5 0 0 1-.5-.5v-2A.5.5 0 0 1 .5 3h.89L8 0ZM3.777 3h8.447L8 1 3.777 3ZM2 6v7h1V6H2Zm2 0v7h2.5V6H4Zm3.5 0v7h1V6h-1Zm2 0v7H12V6H9.5ZM13 6v7h1V6h-1Zm2-1V4H1v1h14Zm-.39 9H1.39l-.25 1h13.72l-.25-1Z" />
+                                                        </svg>
+                                                    </i>
+                                                </div>
+                                                <input type="text" name="Iban" class="form-control" id="inlineFormInputGroupUsername" placeholder="Iban">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <br />
+                                    <div class="row mb-2">
+                                        <div class="col">
+                                            <input type="text" name="Location" class="form-control" placeholder="Hatay/Hasssa">
+                                        </div>
+                                        <div class="form-group mb-0 col-6">
+                                            <input id="rangeCalendarFlatpickr" name="StartedDate" class="form-control flatpickr flatpickr-input active" type="date" placeholder="Tarih Seçiniz">
+                                        </div>
+                                    </div>
+                                    <div class="row mb-2">
+                                        <div class="col-6">
+                                            <label class="visually-hidden" for="inlineFormInputGroupUsername">Durum</label>
+                                            <div class="input-group">
+                                                <select class="form-select" name="DepartmentId" aria-label="Default select example">
+                                                    <option selected>--Backend Developer--</option>
+                                                    <option value="True">Frontend Developer</option>
+                                                    <option value="False">FullStack Developer</option>
+                                                    <option value="True">Leader</option>
+                                                    <option value="False">Project Manager</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-6 mb-2">
+                                            <div class="input-group">
+                                                <select class="form-select" name="Condition" aria-label="Default select example">
+                                                    <option selected>--Durum--</option>
+                                                    <option value="True">Aktif</option>
+                                                    <option value="False">Pasif</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <br />
+                                </div>
+                                <div class="col-6 mb-2">
+                                    <div>
+                                        <h4><strong class="text-center">Aile Bilgileri</strong></h4>
+                                    </div>
+                                    <div class="row mb-2">
+                                        <div class="col">
+                                            <input type="text" name="Mother" class="form-control" placeholder="Anne">
+                                        </div>
+                                        <div class="col">
+                                            <input type="text" name="Father" class="form-control" placeholder="Baba">
+                                        </div>
+                                    </div>
+                                    <h4><strong class="text-center">Acil Durum Bilgileri</strong></h4>
+                                    <div class="row mb-2">
+                                        <div class="col">
+                                            <input type="text" name="UrgentPerson" class="form-control" placeholder="Ad-Soyad">
+                                        </div>
+                                        <div class="col">
+                                            <input type="text" name="UrgentPhone" class="form-control" placeholder="Telefon">
+                                        </div>
+                                    </div>
+                                    <span>Adres</span>
+                                    <div class="row">
+                                        <div class="col-12">
+                                            <div class="form-group">
+                                                <textarea class="form-control" name="Address" id="exampleFormControlTextarea1" rows="7" placeholder="Meydan Kavağı Mahallesi,Değirmenönü Caddesi, Sıla Apartmanı 112/A, Muratpaşa,Antalya"></textarea>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="modal-footer md-button">
+
+                                <input type="submit" value="Güncelle" class="btn btn-primary" />
+                                <input type="reset" value="Temizle" class="btn btn-danger" />
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="content" class="main-content">
+    <div class="layout-px-spacing">
+
+        <div class="middle-content container-xxl p-0">
+
+            <!-- BREADCRUMB -->
+            <div class="page-meta">
+                <nav class="breadcrumb-style-one" aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="#">Users</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Profile</li>
+                    </ol>
+                </nav>
+            </div>
+            <!-- /BREADCRUMB -->
+
+            <div class="row layout-spacing ">
+
+                <!-- Content -->
+                <div class="col-xl-5 col-lg-12 col-md-12 col-sm-12 layout-top-spacing">
+                    <div class="user-profile">
+                        <div class="widget-content widget-content-area">
+                            <div class="d-flex justify-content-between">
+                                <h3 class="">Profile</h3>
+                                <a class="badge btnGetWhere badge-light-primary text-start me-2 action-edit" href="javascript:void(0);">
+                                    <svg xmlns="http://www.w3.org/2000/svg" id="btn-add-contact" onclick="detailajax(this)" data-id="@Model.Id" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <line x1="12" y1="20" x2="21" y2="20"></line>
+                                        <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
+                                    </svg>
+                                </a>
+
+                            </div>
+                            <div class="text-center user-info">
+                                <img src="/cork-v3.8.0/Employees-Foto/@Model.ImageUrl" alt="avatar">
+                                <p class="">@Model.Name @Model.Surname</p>
+                            </div>
+                            <div class="user-info-list">
+
+                                <div class="">
+                                    <ul class="contacts-block list-unstyled">
+                                        <li class="contacts-block__item">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-coffee me-3"><path d="M18 8h1a4 4 0 0 1 0 8h-1"></path><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"></path><line x1="6" y1="1" x2="6" y2="4"></line><line x1="10" y1="1" x2="10" y2="4"></line><line x1="14" y1="1" x2="14" y2="4"></line></svg> Web Developer
+                                        </li>
+                                        <li class="contacts-block__item">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-calendar me-3"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>@Model.StartedDate
+                                        </li>
+                                        <li class="contacts-block__item">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-map-pin me-3"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>@Model.Location
+                                        </li>
+                                        <li class="contacts-block__item">
+                                            <a href="mailto:example@mail.com"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-mail me-3"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>@Model.Email</a>
+                                        </li>
+                                        <li class="contacts-block__item">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-phone me-3"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg> (+90)@Model.Phone
+                                        </li>
+                                    </ul>
+
+                                    <ul class="list-inline mt-4">
+                                        <li class="list-inline-item mb-0">
+                                            <a class="btn btn-info btn-icon btn-rounded" href="javascript:void(0);">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-twitter"><path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"></path></svg>
+                                            </a>
+                                        </li>
+                                        <li class="list-inline-item mb-0">
+                                            <a class="btn btn-danger btn-icon btn-rounded" href="javascript:void(0);">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-dribbble"><circle cx="12" cy="12" r="10"></circle><path d="M8.56 2.75c4.37 6.03 6.02 9.42 8.03 17.72m2.54-15.38c-3.72 4.35-8.94 5.66-16.88 5.85m19.5 1.9c-3.5-.93-6.63-.82-8.94 0-2.58.92-5.01 2.86-7.44 6.32"></path></svg>
+                                            </a>
+                                        </li>
+                                        <li class="list-inline-item mb-0">
+                                            <a class="btn btn-dark btn-icon btn-rounded" href="javascript:void(0);">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-github"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path></svg>
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-xl-7 col-lg-12 col-md-12 col-sm-12 layout-top-spacing">
+
+                    <div class="usr-tasks ">
+                        <div class="widget-content widget-content-area">
+                            <h3 class="">Task</h3>
+                            <div class="table-responsive">
+                                <table class="table table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th>Projects</th>
+                                            <th>Progress</th>
+                                            <th>Task Done</th>
+                                            <th class="text-center">Time</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>Figma Design</td>
+                                            <td>
+                                                <div class="progress br-30">
+                                                    <div class="progress-bar br-30 bg-danger" role="progressbar" style="width: 29.56%" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"></div>
+                                                </div>
+                                            </td>
+                                            <td><p class="text-danger">29.56%</p></td>
+                                            <td class="text-center">
+                                                <p>2 mins ago</p>
+                                            </td>
+                                        </tr>
+
+                                        <tr>
+                                            <td>Vue Migration</td>
+                                            <td>
+                                                <div class="progress br-30">
+                                                    <div class="progress-bar br-30 bg-info" role="progressbar" style="width: 50%" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"></div>
+                                                </div>
+                                            </td>
+                                            <td><p class="text-success">50%</p></td>
+                                            <td class="text-center">
+                                                <p>4 hrs ago</p>
+                                            </td>
+                                        </tr>
+
+                                        <tr>
+                                            <td>Flutter App</td>
+                                            <td>
+                                                <div class="progress br-30">
+                                                    <div class="progress-bar br-30 bg-warning" role="progressbar" style="width: 39%" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"></div>
+                                                </div>
+                                            </td>
+                                            <td><p class="text-danger">39%</p></td>
+                                            <td class="text-center">
+                                                <p>a min ago</p>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>API Integration</td>
+                                            <td>
+                                                <div class="progress br-30">
+                                                    <div class="progress-bar br-30 bg-success" role="progressbar" style="width: 78.03%" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"></div>
+                                                </div>
+                                            </td>
+                                            <td><p class="text-success">78.03%</p></td>
+                                            <td class="text-center">
+                                                <p>2 weeks ago</p>
+                                            </td>
+                                        </tr>
+
+                                        <tr>
+                                            <td>Blog Update</td>
+                                            <td>
+                                                <div class="progress br-30">
+                                                    <div class="progress-bar br-30 bg-secondary" role="progressbar" style="width: 100%" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"></div>
+                                                </div>
+                                            </td>
+                                            <td><p class="text-success">100%</p></td>
+                                            <td class="text-center">
+                                                <p>18 hrs ago</p>
+                                            </td>
+                                        </tr>
+
+                                        <tr>
+                                            <td>Landing Page</td>
+                                            <td>
+                                                <div class="progress br-30">
+                                                    <div class="progress-bar br-30 bg-danger" role="progressbar" style="width: 19.15%" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"></div>
+                                                </div>
+                                            </td>
+                                            <td><p class="text-danger">19.15%</p></td>
+                                            <td class="text-center">
+                                                <p>5 days ago</p>
+                                            </td>
+                                        </tr>
+
+                                        <tr>
+                                            <td>Shopify Dev</td>
+                                            <td>
+                                                <div class="progress br-30">
+                                                    <div class="progress-bar br-30 bg-info" role="progressbar" style="width: 60.55%" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"></div>
+                                                </div>
+                                            </td>
+                                            <td><p class="text-success">60.55%</p></td>
+                                            <td class="text-center">
+                                                <p>8 days ago</p>
+                                            </td>
+                                        </tr>
+
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="row">
+
+                <div class="col-xl-6 col-lg-12 col-md-12 col-sm-12">
+                    <div class="summary layout-spacing ">
+                        <div class="widget-content widget-content-area">
+                            <h3 class="">Summary</h3>
+                            <div class="order-summary">
+
+                                <div class="summary-list summary-income">
+
+                                    <div class="summery-info">
+
+                                        <div class="w-icon">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-shopping-bag"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path><line x1="3" y1="6" x2="21" y2="6"></line><path d="M16 10a4 4 0 0 1-8 0"></path></svg>
+                                        </div>
+
+                                        <div class="w-summary-details">
+
+                                            <div class="w-summary-info">
+                                                <h6>Income <span class="summary-count">$92,600 </span></h6>
+                                                <p class="summary-average">90%</p>
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                                <div class="summary-list summary-profit">
+
+                                    <div class="summery-info">
+
+                                        <div class="w-icon">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-dollar-sign"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+                                        </div>
+
+                                        <div class="w-summary-details">
+
+                                            <div class="w-summary-info">
+                                                <h6>Profit <span class="summary-count">$37,515</span></h6>
+                                                <p class="summary-average">65%</p>
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                                <div class="summary-list summary-expenses">
+
+                                    <div class="summery-info">
+
+                                        <div class="w-icon">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-credit-card"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>
+                                        </div>
+                                        <div class="w-summary-details">
+
+                                            <div class="w-summary-info">
+                                                <h6>Expenses <span class="summary-count">$55,085</span></h6>
+                                                <p class="summary-average">42%</p>
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-xl-6 col-lg-12 col-md-12 col-sm-12">
+
+                    <div class="pro-plan layout-spacing">
+                        <div class="widget">
+
+                            <div class="widget-heading">
+
+                                <div class="task-info">
+                                    <div class="w-title">
+                                        <h5>Pro Plan</h5>
+                                        <span>$25/month</span>
+                                    </div>
+                                </div>
+
+                                <div class="task-action">
+                                    <button class="btn btn-secondary">Renew Now</button>
+                                </div>
+                            </div>
+
+                            <div class="widget-content">
+
+                                <ul class="p-2 ps-3 mb-4">
+                                    <li class="mb-1"><strong>10,000 Monthly Visitors</strong></li>
+                                    <li class="mb-1"><strong>Unlimited Reports</strong></li>
+                                    <li class=""><strong>2 Years Data Storage</strong></li>
+                                </ul>
+
+                                <div class="progress-data">
+                                    <div class="progress-info">
+                                        <div class="due-time">
+                                            <p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-clock"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg> 5 Days Left</p>
+                                        </div>
+                                        <div class="progress-stats"><p class="text-info">$25 / month</p></div>
+                                    </div>
+
+                                    <div class="progress">
+                                        <div class="progress-bar bg-primary" role="progressbar" style="width: 65%" aria-valuenow="90" aria-valuemin="0" aria-valuemax="100"></div>
+                                    </div>
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div class="col-xl-6 col-lg-12 col-md-12 col-sm-12">
+                    <div class="payment-history layout-spacing ">
+                        <div class="widget-content widget-content-area">
+                            <h3 class="">Payment History</h3>
+
+                            <div class="list-group">
+                                <div class="list-group-item d-flex justify-content-between align-items-start">
+                                    <div class="me-auto">
+                                        <div class="fw-bold title">March</div>
+                                        <p class="sub-title mb-0">Pro Membership</p>
+                                    </div>
+                                    <span class="pay-pricing align-self-center me-3">$45</span>
+                                    <div class="btn-group dropstart align-self-center" role="group">
+                                        <a id="paymentHistory1" href="javascript:void(0);" class="dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-more-horizontal"><circle cx="12" cy="12" r="1"></circle><circle cx="19" cy="12" r="1"></circle><circle cx="5" cy="12" r="1"></circle></svg>
+                                        </a>
+                                        <div class="dropdown-menu" aria-labelledby="paymentHistory1">
+                                            <a class="dropdown-item" href="javascript:void(0);">View Invoice</a>
+                                            <a class="dropdown-item" href="javascript:void(0);">Download Invoice</a>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="list-group-item d-flex justify-content-between align-items-start">
+                                    <div class="me-auto">
+                                        <div class="fw-bold title">February</div>
+                                        <p class="sub-title mb-0">Pro Membership</p>
+                                    </div>
+                                    <span class="pay-pricing align-self-center me-3">$45</span>
+                                    <div class="btn-group dropstart align-self-center" role="group">
+                                        <a id="paymentHistory2" href="javascript:void(0);" class="dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-more-horizontal"><circle cx="12" cy="12" r="1"></circle><circle cx="19" cy="12" r="1"></circle><circle cx="5" cy="12" r="1"></circle></svg>
+                                        </a>
+                                        <div class="dropdown-menu" aria-labelledby="paymentHistory2">
+                                            <a class="dropdown-item" href="javascript:void(0);">View Invoice</a>
+                                            <a class="dropdown-item" href="javascript:void(0);">Download Invoice</a>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="list-group-item d-flex justify-content-between align-items-start">
+                                    <div class="me-auto">
+                                        <div class="fw-bold title">January</div>
+                                        <p class="sub-title mb-0">Pro Membership</p>
+                                    </div>
+                                    <span class="pay-pricing align-self-center me-3">$45</span>
+                                    <div class="btn-group dropstart align-self-center" role="group">
+                                        <a id="paymentHistory3" href="javascript:void(0);" class="dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-more-horizontal"><circle cx="12" cy="12" r="1"></circle><circle cx="19" cy="12" r="1"></circle><circle cx="5" cy="12" r="1"></circle></svg>
+                                        </a>
+                                        <div class="dropdown-menu" aria-labelledby="paymentHistory3">
+                                            <a class="dropdown-item" href="javascript:void(0);">View Invoice</a>
+                                            <a class="dropdown-item" href="javascript:void(0);">Download Invoice</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-xl-6 col-lg-12 col-md-12 col-sm-12">
+                    <div class="payment-methods layout-spacing ">
+                        <div class="widget-content widget-content-area">
+                            <h3 class="">Payment Methods</h3>
+
+                            <div class="list-group">
+                                <div class="list-group-item d-flex justify-content-between align-items-start">
+                                    <img src="/cork-v3.8.0/html/src/assets/img/card-americanexpress.svg" class="align-self-center me-3" alt="americanexpress">
+                                    <div class="me-auto">
+                                        <div class="fw-bold title">American Express</div>
+                                        <p class="sub-title mb-0">Expires on 12/2025</p>
+                                    </div>
+                                    <span class="badge badge-success align-self-center me-3">Primary</span>
+                                </div>
+
+                                <div class="list-group-item d-flex justify-content-between align-items-start">
+                                    <img src="/cork-v3.8.0/html/src/assets/img/card-mastercard.svg" class="align-self-center me-3" alt="mastercard">
+                                    <div class="me-auto">
+                                        <div class="fw-bold title">Mastercard</div>
+                                        <p class="sub-title mb-0">Expires on 03/2025</p>
+                                    </div>
+                                </div>
+
+                                <div class="list-group-item d-flex justify-content-between align-items-start">
+                                    <img src="/cork-v3.8.0/html/src/assets/img/card-visa.svg" class="align-self-center me-3" alt="visa">
+                                    <div class="me-auto">
+                                        <div class="fw-bold title">Visa</div>
+                                        <p class="sub-title mb-0">Expires on 10/2025</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+    <!--  BEGIN FOOTER  -->
+    <div class="footer-wrapper">
+        <div class="footer-section f-section-1">
+            <p class="">Copyright © <span class="dynamic-year">2022</span> <a target="_blank" href="https://designreset.com/cork-admin/">DesignReset</a>, All rights reserved.</p>
+        </div>
+        <div class="footer-section f-section-2">
+            <p class="">Coded with <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-heart"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg></p>
+        </div>
+    </div>
+    <!--  END FOOTER  -->
+
+</div>
+

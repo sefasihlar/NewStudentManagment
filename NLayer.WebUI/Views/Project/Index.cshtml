@@ -1,0 +1,553 @@
+﻿@using NLayer.Core.DTOs.ProjectDtos
+@model List<GetWithEmployeesListDto>
+@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section Scripts{
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        function performDetailProject(element) {
+            var id = $(element).attr('data-id1');
+
+            $.ajax({
+                contentType: "application/json",
+                dataType: "json",
+                type: 'GET',
+                url: '/Project/Detail/' + id,
+                success: function (response) {
+                    // Dönen sonucu işleyin ve alanları doldurun
+                    var project = JSON.parse(response); // JSON dizesini nesneye dönüştür
+
+                    console.log(project);
+                    // Form inputlarını doldurma işlemi
+                    var formValues = [
+                        { name: "Id", value: project.Id },
+                        { name: "Title", value: project.Title },
+                        { name: "ProjectManager", value: project.ProjectManager },
+                        { name: "Description", value: project.Description },
+                    ];
+
+                    // Ondalık kısmı olup olmadığını kontrol edin ve ComplationRate alanını doldurun
+                    if (!isNaN(project.ComplationRate)) {
+                        formValues.push({ name: "ComplationRate", value: Math.trunc(parseFloat(project.ComplationRate)) });
+                    } else {
+                        formValues.push({ name: "ComplationRate", value: project.ComplationRate });
+                    }
+
+                    console.log(formValues);
+
+                    formValues.forEach(function (item) {
+                        $('input[name="' + item.name + '"]').val(item.value);
+                        $('textarea[name="' + item.name + '"]').val(item.value);
+                    });
+                },
+                error: function (xhr, status, error) {
+                    console.log("Hata:", error);
+                }
+            });
+        }
+
+
+
+
+        $('#kaydetButton').click(function () {
+            location.reload();
+        });
+    </script>
+    <script>
+        var selectedStudentIds = [];
+        var projectId = null;
+        function performAddEmployeesAjax(element) {
+            projectId = element.getAttribute("data-id31");
+            // Sayfa yüklendiğinde çalışan listesini almak için Ajax isteği yapar.
+            $.ajax({
+                contentType: "application/json",
+                dataType: "json",
+                type: "GET",
+                url: "/Project/GetEmployeesList",
+                success: function (response) {
+                    response = JSON.parse(response); // JSON dizesini nesneye dönüştür
+                    console.log(response);
+                    // Tabloyu temizle
+                    $("#studentTable").empty();
+
+                    // Her bir öğrenci için tabloya yeni bir satır ekle
+                    response.forEach(function (student, index) {
+                        // Cinsiyete bağlı olarak profil resmi belirle
+                        var avatarImage = "/cork-v3.8.0/Employees-Foto/" + student.ImageUrl;
+
+                        var studentRow = `
+                                                                          <tr>
+                                                          <td>${index + 1}</td>
+                                                              <td>
+                                                                <div class="d-flex">
+                                                                  <div class="usr-img-frame me-2 rounded-circle">
+                                                                      <img alt="avatar" class="img-fluid rounded-circle" src="${avatarImage}">
+                                                                         </div>
+                                                                              <p class="align-self-center mb-0 user-name">${student.Name} ${student.Surname}</p>
+                                                                         </div>
+                                                                          </td>
+                                                                           <td>
+                                                                             <div class="form-check form-check-warning form-check-inline">
+                                                                                    <input class="form-check-input" type="checkbox" name="StudentIds" value="${student.Id}" id="form-check-warning">
+                                                                                    <label class="form-check-label" for="form-check-warning">
+                                                                                    </label>
+                                                                                </div>
+                                                                            </td>
+                                                                        </tr>`;
+
+
+                        // Yeni satırı tabloya ekle
+                        $("#studentTable").append(studentRow);
+                    });
+                },
+                error: function (xhr) {
+                    alert("Bir hata oluştu: " + xhr.status + " " + xhr.statusText);
+                },
+            });
+        }
+        $(document).on('change', 'input[name="StudentIds"]', function () {
+            var studentId = $(this).val();
+            if ($(this).is(":checked")) {
+                // Checkbox seçiliyse öğrenci Id'sini diziye ekle
+                selectedStudentIds.push(studentId);
+
+            } else {
+                // Checkbox seçili değilse öğrenci Id'sini diziden çıkar
+                var index = selectedStudentIds.indexOf(studentId);
+                if (index !== -1) {
+                    selectedStudentIds.splice(index, 1);
+                }
+            }
+        });
+        function sendSelectedStudentIdsToServer() {
+            // Seçilen öğrenci Id'lerini model tarafına göndermek için bir POST isteği yapar
+            $.ajax({
+                type: "POST",
+                url: "/Project/CreateProjectEmployees",
+                data: { ProjectId: projectId, SelectedIds: selectedStudentIds },
+                success: function (response) {
+
+                    // İşlem başarılıysa burada yapılacak işlemler
+                },
+
+            });
+        }
+    </script>
+    <script>
+        function performDetailAjax(element) {
+            var id = $(element).attr('data-id1');
+
+            $.ajax({
+                contentType: "application/json",
+                dataType: "json",
+                type: 'GET',
+                url: '/Department/Detail/' + id,
+                success: function (response) {
+                    // Dönen sonucu işleyin ve alanları doldurun
+                    var employee = JSON.parse(response); // JSON dizesini nesneye dönüştür
+                    // Form inputlarını doldurma işlemi
+                    var formValues = [
+                        { name: "Id", value: employee.Id },
+                        { name: "Name", value: employee.Name },
+                        { name: "DepartmentManager", value: employee.DepartmentManager },
+                        { name: "Description", value: employee.Description },
+                    ];
+
+                    formValues.forEach(function (item) {
+                        $('input[name="' + item.name + '"]').val(item.value);
+                        $('textarea[name="' + item.name + '"]').val(item.value);
+                    });
+                },
+                error: function (xhr, status, error) {
+                    console.log("Hata:", error);
+                }
+            });
+        }
+
+        $('#kaydetButton').click(function () {
+            location.reload();
+        });
+    </script>
+    <script>
+        function performDeleteAjax(element) {
+            var id = $(element).attr('data-id2'); // data-id değerini al
+            var formData = {
+                Id: id,
+            };
+
+            $.ajax({
+                type: 'POST',
+                url: '/Project/Delete', // API veya Controller URL'sini buraya yazın
+                data: formData,
+                success: function (result) {
+                    // Başarılı olduğunda yapılacak işlemler
+                    // Örneğin, formu sıfırla veya yeni bir not eklendiğini kullanıcıya bildir
+                },
+                error: function (xhr, status, error) {
+                    // Hata durumunda yapılacak işlemler
+                    // Örneğin, hatayı kullanıcıya bildir
+                }
+            });
+        }
+    </script>
+    <script>
+        var slider = document.getElementById("myRange");
+        var output = document.getElementById("demo");
+        output.innerHTML = slider.value; // Display the default slider value
+
+        // Update the current slider value (each time you drag the slider handle)
+        slider.oninput = function () {
+            output.innerHTML = this.value;
+        }
+    </script>
+
+}
+<div id="AddEmployees" class="modal animated rotateInDownLeft custo-rotateInDownLeft" role="dialog">
+    <div class="modal-dialog modal-lg">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Yokalmaya Öğrenci Ekle</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+                    <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-x"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form method="post">
+                    <!-- Diğer form elemanları buraya eklenebilir -->
+                    <input type="hidden" name="StudentIds" val="" />
+                    <input type="hidden" name="ProjecetId" val="" />
+                    <!-- ... -->
+                    <div class="middle-content container-xxl p-0">
+                        <div class="row" id="cancel-row">
+                            <div class="col-xl-12 col-lg-12 col-sm-12 layout-top-spacing layout-spacing">
+                                <div class="widget-content widget-content-area br-8">
+                                    <table id="invoice-list" class="table dt-table-hover" style="width:100%">
+                                        <thead>
+                                            <tr>
+                                                <th>Kod</th>
+                                                <th>Ad-Soyad</th>
+                                                <th>Ekle</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="studentTable">
+                                            <!-- Burada öğrenciler dinamik olarak eklenecek -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary" onclick="sendSelectedStudentIdsToServer(this)">Kaydet</button>
+
+                </form>
+            </div>
+
+
+        </div>
+    </div>
+</div>
+<div id="zoomupModal" class="modal animated zoomInUp custo-zoomInUp" role="dialog">
+    <div class="modal-dialog">
+        <!-- Modal content-->
+        <div class="modal-content ">
+            <div class="modal-header">
+                <h5 class="modal-title">Prroje Kayıt</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+                    <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-x"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form asp-controller="Project" asp-action="Create" method="post">
+                    <div class="row">
+                        <div class="col-12">
+
+                            <div class="row mb-12">
+                                <div class="col">
+                                    <input type="text" name="Title" class="form-control" placeholder="Proje Başlığı">
+                                </div>
+                            </div>
+                            <br />
+                            <div class="row mb-4">
+                                <div class="col-8">
+                                    <div class="input-group">
+                                        <div class="input-group-text">
+                                            <i class="bi bi-person">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-person" viewBox="0 0 16 16">
+                                                    <path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6Zm2-3a2 2 0 1 1-4 0 2 2 0 0 1 4 0Zm4 8c0 1-1 1-1 1H3s-1 0-1-1 1-4 6-4 6 3 6 4Zm-1-.004c-.001-.246-.154-.986-.832-1.664C11.516 10.68 10.289 10 8 10c-2.29 0-3.516.68-4.168 1.332-.678.678-.83 1.418-.832 1.664h10Z" />
+                                                </svg>
+                                            </i>
+                                        </div>
+                                        <input type="text" class="form-control" name="ProjectManager" id="inlineFormInputGroupUsername" placeholder="Proje Yöneticisi">
+                                    </div>
+                                </div>
+                                <div class="col-4">
+                                    <label class="visually-hidden" for="inlineFormInputGroupUsername">Durum</label>
+                                    <div class="input-group">
+                                        <select class="form-select" name="Condition" aria-label="Default select example">
+                                            <option selected>-Durum-</option>
+                                            <option value="True">Aktif</option>
+                                            <option value="False">Pasif</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <br />
+                            </div>
+                            <div class="row">
+
+                                <div class="col-6">
+                                    <span>Başlama Tarihi</span>
+                                    <div class="form-group mb-0">
+                                        <input id="rangeCalendarFlatpickr" name="StartedDate" class="form-control flatpickr flatpickr-input active" type="date" placeholder="Tarih Seçiniz">
+                                    </div>
+                                </div>
+
+                                <div class="col-6">
+                                    <span>Bitiş Tarihi</span>
+                                    <div class="form-group mb-0">
+                                        <input id="rangeCalendarFlatpickr" name="EndDate" class="form-control flatpickr flatpickr-input active" type="date" placeholder="Tarih Seçiniz">
+                                    </div>
+                                </div>
+                            </div>
+                            <br />
+                            <div class="row mb-4">
+                                <div class="col-12">
+                                    <div class="form-group">
+                                        <label for="exampleFormControlTextarea1">Açıklama</label>
+                                        <textarea name="Description" placeholder="Proje Açıklaması..." class="form-control" id="exampleFormControlTextarea1" rows="3"></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="modal-footer md-button">
+                        <button type="submit" class="btn btn-primary">Kaydet</button>
+                    </div>
+                </form>
+            </div>
+
+        </div>
+    </div>
+</div>
+<div id="ProjcetDetay" class="modal animated zoomInUp custo-zoomInUp" role="dialog">
+    <div class="modal-dialog">
+        <!-- Modal content-->
+        <div class="modal-content ">
+            <div class="modal-header">
+                <h5 class="modal-title">Proje Detay</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+                    <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-x"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form asp-controller="Project" asp-action="Update" method="post">
+                    <input type="hidden" value="" name="Id"/>
+                    <div class="row">
+                        <div class="col-12">
+
+                            <div class="row mb-12">
+                                <div class="col">
+                                    <input type="text" name="Title" class="form-control" placeholder="Proje Başlığı">
+                                </div>
+                            </div>
+                            <br />
+                            <div class="row mb-4">
+                                <div class="col-8">
+                                    <div class="input-group">
+                                        <div class="input-group-text">
+                                            <i class="bi bi-person">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-person" viewBox="0 0 16 16">
+                                                    <path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6Zm2-3a2 2 0 1 1-4 0 2 2 0 0 1 4 0Zm4 8c0 1-1 1-1 1H3s-1 0-1-1 1-4 6-4 6 3 6 4Zm-1-.004c-.001-.246-.154-.986-.832-1.664C11.516 10.68 10.289 10 8 10c-2.29 0-3.516.68-4.168 1.332-.678.678-.83 1.418-.832 1.664h10Z" />
+                                                </svg>
+                                            </i>
+                                        </div>
+                                        <input type="text" class="form-control" name="ProjectManager" id="inlineFormInputGroupUsername" placeholder="Proje Yöneticisi">
+                                    </div>
+                                </div>
+                                <div class="col-4">
+                                    <label class="visually-hidden" for="inlineFormInputGroupUsername">Durum</label>
+                                    <div class="input-group">
+                                        <select class="form-select" name="Condition" aria-label="Default select example">
+                                            <option selected>-Durum-</option>
+                                            <option value="True">Aktif</option>
+                                            <option value="False">Pasif</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <br />
+                            </div>
+                            <div class="row">
+
+                                <div class="col-6">
+                                    <span>Başlama Tarihi</span>
+                                    <div class="form-group mb-0">
+                                        <input id="rangeCalendarFlatpickr" name="StartedDate" class="form-control flatpickr flatpickr-input active" type="date" placeholder="Tarih Seçiniz">
+                                    </div>
+                                </div>
+
+                                <div class="col-6">
+                                    <span>Bitiş Tarihi</span>
+                                    <div class="form-group mb-0">
+                                        <input id="rangeCalendarFlatpickr" name="EndDate" class="form-control flatpickr flatpickr-input active" type="date" placeholder="Tarih Seçiniz">
+                                    </div>
+                                </div>
+                            </div>
+                            <br />
+                            <div class="row mb-4">
+                                <div class="col-12">
+                                    <div class="form-group">
+                                        <label for="exampleFormControlTextarea1">Açıklama</label>
+                                        <textarea name="Description" placeholder="Proje Açıklaması..." class="form-control" id="exampleFormControlTextarea1" rows="3"></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="mt-3 mb-5">
+                                <div class="form-group row">
+                                    <div class="col-md-9">
+                                        <label for="formControlRange">Proje Tamamlanma Oranı</label>
+                                        <input type="range" min="0" max="100" name="ComplationRate" value="" class="form-control-range range-slider" id="myRange" onchange="updateCompletionRate(this.value)">
+                                    </div>
+                                    <div class="col-md-3">
+                                        <span id="demo"></span>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <div class="modal-footer md-button">
+                        <button type="submit" class="btn btn-primary">Kaydet</button>
+                    </div>
+                </form>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<div id="content" class="main-content">
+    <div class="layout-px-spacing">
+        <div class="middle-content container-xxl p-0">
+            <div class="col-lg-6">
+                <!-- Zoom in up modal -->
+                <button type="button" class="btn btn-primary mt-5 mr-2" data-bs-toggle="modal" data-bs-target="#zoomupModal">Proje Ekle</button>
+            </div>
+            <div class="row layout-top-spacing">
+                @foreach (var item in Model)
+                {
+                    decimal rate = item.ComplationRate;
+                    string percentage = $"{rate}%";
+                    <div class="col-xl-4 col-lg-6 col-md-6 col-sm-12 col-12 layout-spacing">
+                        <div class="widget widget-five">
+
+                            <div class="widget-heading">
+
+                                <a href="javascript:void(0)" class="task-info">
+
+                                    @if (!string.IsNullOrEmpty(item.Title))
+                                    {
+                                        string ProjectTitle = item.Title;
+                                        string[] words = ProjectTitle.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+
+                                        string firstWord = words.Length > 0 ? words[0][0].ToString().ToUpper() : "";
+                                        string lastWord = words.Length > 0 ? words[words.Length - 1][0].ToString().ToUpper() : "";
+
+                                        <div class="usr-avatar">
+                                            <span>@firstWord@lastWord</span>
+                                        </div>
+                                    }
+
+                                    <div class="w-title">
+
+                                        <h5>@item.Title</h5>
+                                        <span>@item.ProjectManager</span>
+
+
+                                    </div>
+
+                                </a>
+
+                                <div class="task-action">
+                                    <div class="dropdown">
+                                        <a class="dropdown-toggle" href="#" role="button" id="pendingTask" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-more-horizontal"><circle cx="12" cy="12" r="1"></circle><circle cx="19" cy="12" r="1"></circle><circle cx="5" cy="12" r="1"></circle></svg>
+                                        </a>
+
+                                        <div class="dropdown-menu left" aria-labelledby="pendingTask" style="will-change: transform;">
+                                            <a class="dropdown-item" data-id1="@item.Id" href="javascript:void(0); " onclick="performDetailProject(this)" data-bs-toggle="modal" data-bs-target="#ProjcetDetay">Düzenle</a>
+
+                                            <!-- HTML -->
+                                            <a class="dropdown-item project-link" data-id1="@item.Id" data-id31="@item.Id" data-bs-toggle="modal" data-bs-target="#AddEmployees" onclick="performAddEmployeesAjax(this)">Projeye Çalışan Ekle</a>
+
+
+
+                                            <a class="dropdown-item" data-id2="@item.Id" onclick="performDeleteAjax(this)">Sil</a>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+
+
+                            <div class="widget-content">
+
+                                <p>@item.Description</p>
+
+                                <div class="progress-data">
+
+                                    <div class="progress-info">
+                                        <div class="task-count"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-check-square"><polyline points="9 11 12 14 22 4"></polyline><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg><p>Görev Tamamalama</p></div>
+                                        <div class="progress-stats"><p>@item.ComplationRate%</p></div>
+                                    </div>
+
+                                    <div class="progress">
+                                        <div class="progress-bar bg-primary" role="progressbar" style="width: @percentage" aria-valuenow="90" aria-valuemin="0" aria-valuemax="100"></div>
+                                    </div>
+
+                                </div>
+
+                                <div class="meta-info">
+
+                                    <div class="due-time">
+                                        <p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-clock"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>Son @item.RemainingTime Gün</p>
+                                    </div>
+
+
+                                    <div class="avatar--group">
+                                        <div class="avatar translateY-axis more-group">
+                                            <span class="avatar-title">+1</span>
+                                        </div>
+                                        @foreach (var value in item.ProjectEmployees.Skip(Math.Max(0, item.ProjectEmployees.Count() - 4)))
+                                        {
+
+                                            <div class="avatar translateY-axis">
+                                                <img alt="avatar" src="/cork-v3.8.0/Employees-Foto/@value.Employees.ImageUrl" />
+                                            </div>
+                                        }
+
+                                    </div>
+
+                                </div>
+
+
+                            </div>
+
+                        </div>
+
+                    </div>
+                }
+
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+

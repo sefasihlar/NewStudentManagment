@@ -1,0 +1,389 @@
+﻿@using NLayer.Core.DTOs.PollingDtos
+@model List<GetWithClassPollingListDto> 
+@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@section Scripts{
+    <script src="~/jquery/jquery/jquery.min.js"></script>
+    <script>
+        $(".btnGetWhere").click(function () {
+            var classId = $(this).data("id1");
+            var pollingDataId = $(this).data("id2");
+            console.log(classId);
+            console.log(pollingDataId);
+            $("#hiddenDataId").val(pollingDataId);
+          
+            $.ajax({
+                contentType: "application/json",
+                dataType: "json",
+                type: "GET",
+                url: "/Polling/GetByPollingIdStudentList",
+                data: { id: classId },
+                success: function (response) {
+                    response = JSON.parse(response); // JSON dizesini nesneye dönüştür
+                    console.log(response);
+                    // Tabloyu temizle
+                    $("#studentTable").empty();
+
+                    // Her bir öğrenci için tabloya yeni bir satır ekle
+                    response.forEach(function (student, index) {
+                        // Cinsiyete bağlı olarak profil resmi belirle
+                        var avatarImage = student.Gender ? "/cork-v3.8.0/boy-student.jpg" : "/cork-v3.8.0/Girl-İcon.png";
+
+                        var studentRow = `
+                    <tr>
+                        <td>${index + 1}</td>
+                   
+                        <td>
+                            <div class="d-flex">
+                                <div class="usr-img-frame me-2 rounded-circle">
+                                    <img alt="avatar" class="img-fluid rounded-circle" src="${avatarImage}">
+                                </div>
+                                        <p class="align-self-center mb-0 user-name">${student.Name} ${student.SurName}</p>
+                            </div>
+                        </td>
+                        <td>
+                             <div class="form-check form-check-warning form-check-inline">
+                                                     <input class="form-check-input" type="checkbox" name="StudentIds" value="${student.Id}" id="form-check-warning">
+                                     <label class="form-check-label" for="form-check-warning">        
+                                </label>
+                            </div>
+                        </td>
+                    </tr>`;
+
+                        // Yeni satırı tabloya ekle
+                        $("#studentTable").append(studentRow);
+                    });
+                },
+                error: function (xhr) {
+                    alert("Bir hata oluştu: " + xhr.status + " " + xhr.statusText);
+                },
+            });
+        });
+    </script>
+    <script>
+        $(".btngetdetail").click(function () {
+            var classId = $(this).data("id3");
+            var pollingDataId = $(this).data("id4");
+            console.log(classId);
+            console.log(pollingDataId);
+            $("#DetailPollingDataId").val(pollingDataId);
+
+            // Tabloyu temizle
+            $("#studentTable").empty();
+
+            $.ajax({
+                contentType: "application/json",
+                dataType: "json",
+                type: "GET",
+                url: "/Polling/GetByPollingIdStudentList",
+                data: { id: classId },
+                success: function (response) {
+                    response = JSON.parse(response); // JSON dizesini nesneye dönüştür
+                    console.log(response);
+
+                    $("#studentTableDetail").empty();
+                    // Her bir öğrenci için tabloya yeni bir satır ekle
+                    response.forEach(function (student, index) {
+                        // Cinsiyete bağlı olarak profil resmi belirle
+                        var avatarImage = student.Gender ? "/cork-v3.8.0/boy-student.jpg" : "/cork-v3.8.0/Girl-İcon.png";
+
+                        var studentRow = `
+                                <tr>
+                                    <td>${index + 1}</td>
+                                    <td>
+                                        <div class="d-flex">
+                                            <div class="usr-img-frame me-2 rounded-circle">
+                                                <img alt="avatar" class="img-fluid rounded-circle" src="${avatarImage}">
+                                            </div>
+                                            <p class="align-self-center mb-0 user-name">${student.Name} ${student.SurName}</p>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="form-check form-check-warning form-check-inline">
+                                            <input class="form-check-input" type="checkbox" name="StudentIds" value="${student.Id}" id="form-check-warning-${index}">
+                                            <label class="form-check-label" for="form-check-warning-${index}"></label>
+                                        </div>
+                                    </td>
+                                </tr>`;
+
+                        // Yeni satırı tabloya ekle
+                        $("#studentTableDetail").append(studentRow);
+                    });
+
+                    // Seçili öğrencilerin listesini al
+                    getSelectedStudents(classId, pollingDataId);
+                },
+                error: function (xhr) {
+                    alert("Bir hata oluştu: " + xhr.status + " " + xhr.statusText);
+                },
+            });
+        });
+
+        // Seçili öğrencilerin listesini almak için AJAX isteği yap
+        function getSelectedStudents(classId, pollingDataId) {
+            $.ajax({
+                contentType: "application/json",
+                dataType: "json",
+                type: "GET",
+                url: "/Polling/Detail",
+                data: { id: pollingDataId },
+                success: function (response) {
+                    response = JSON.parse(response);
+                    var selectedStudents = response.map(function (student) {
+                        return student.Id;
+                    });
+
+                    // Karşılaştırma yap ve seçili checkbox'ları ayarla
+                    response.forEach(function (student, index) {
+                        var checkbox = $(`#form-check-warning-${index}`);
+                        checkbox.prop("checked", selectedStudents.includes(student.Id));
+                    });
+                },
+                error: function (xhr) {
+                    alert("Bir hata oluştu: " + xhr.status + " " + xhr.statusText);
+                },
+            });
+        }
+
+    </script>
+}
+<div id="content" class="main-content">
+    <br />
+@*
+     @await Component.InvokeAsync("PollingRapor")*@
+
+    <div class="layout-px-spacing">
+        <div class="col-lg-6">
+            <button type="button" class="btn btn-info mt-5 mr-0" data-bs-toggle="modal" data-bs-target="#rotateleftModal">Yoklama Ekle</button>
+        </div>
+        <div id="rotateleftModal" class="modal animated rotateInDownLeft custo-rotateInDownLeft" role="dialog">
+            <div class="modal-dialog ">
+                <!-- Modal content-->
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Yoklama Kayıt</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+                            <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-x"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <form asp-controller="Polling" asp-action="Create" method="post">
+                           
+
+
+                            <div class="row mb-4">
+                                <div class="col">
+                                    <input type="text" class="form-control" name="Name" placeholder="Yoklama Adı">
+                                </div>
+                                <div class="col">
+                                    @await Component.InvokeAsync("ClassList")
+                                </div>
+                                <br />
+                            </div>
+                            <div class="row mb-4">
+                                <div class="form-group mb-0 col-6">
+                                    <input id="rangeCalendarFlatpickr" name="PollingDate" class="form-control flatpickr flatpickr-input active" type="date" placeholder="Tarih Seçiniz">
+                                </div>
+                                <div class="col-6">
+                                    <select class="form-select" name="Condition" aria-label="Default select example">
+                                        <option value="True">Aktif</option>
+                                        <option value="False">Pasif</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="row mb-4">
+                                <div class="col-12">
+
+                                    <textarea type="text" name="Description" class="form-control" placeholder="Açıklama"></textarea>
+                                </div>
+                            </div>
+                            <div class="modal-footer md-button">
+                                <button type="submit" class="btn btn-primary">Kaydet</button>
+                            </div>
+                        </form>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+        <div id="Yoklama" class="modal animated rotateInDownLeft custo-rotateInDownLeft" role="dialog">
+            <div class="modal-dialog modal-lg">
+                <!-- Modal content-->
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Yokalmaya Öğrenci Ekle</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+                            <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-x"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <form asp-asp-controller="Polling" asp-action="AddToStudent" method="post">
+                            <input type="hidden" id="hiddenDataId" name="PollingId">
+                            <div class="middle-content container-xxl p-0">
+                                <div class="row" id="cancel-row">
+
+                                    <div class="col-xl-12 col-lg-12 col-sm-12 layout-top-spacing layout-spacing">
+                                        <div class="widget-content widget-content-area br-8">
+                                            <table id="invoice-list" class="table dt-table-hover" style="width:100%">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Kod</th>
+                                                        <th>Ad-Soyad</th>
+                                                        <th>Ekle</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody id="studentTable">
+                                                    <!-- Burada öğrenciler dinamik olarak eklenecek -->
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+
+                                </div>
+
+                            </div>
+                           <button type="submit" class="btn btn-primary">Kaydet</button>
+                        </form>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <div id="Detay" class="modal animated rotateInDownLeft custo-rotateInDownLeft" role="dialog">
+            <div class="modal-dialog modal-lg">
+                <!-- Modal content-->
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Yokalmaya Öğrenci Ekle</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+                            <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-x"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <form asp-asp-controller="Polling" asp-action="Update" method="post">
+                            <input type="hidden" id="DetailPollingDataId" name="PollingId">
+                            <div class="middle-content container-xxl p-0">
+                                <div class="row" id="cancel-row">
+
+                                    <div class="col-xl-12 col-lg-12 col-sm-12 layout-top-spacing layout-spacing">
+                                        <div class="widget-content widget-content-area br-8">
+                                            <table id="invoice-list" class="table dt-table-hover" style="width:100%">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Kod</th>
+                                                        <th>Ad-Soyad</th>
+                                                        <th>Ekle</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody id="studentTableDetail">
+                                                    <!-- Burada öğrenciler dinamik olarak eklenecek -->
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+
+                                </div>
+
+                            </div>
+                            <button type="submit" class="btn btn-primary">Güncelle</button>
+                        </form>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <br />
+        <div class="table-responsive">
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                      
+                        <th scope="col">Adı</th>
+                        @*<th class="text-center" scope="col">Açıklaması</th> yoklama açıklaması incele kısmında olması gerekmektedir*@
+                        <th class="text-center" scope="col">Ders</th>
+                        <th scope="col">Ekleyen</th>
+                        <th scope="col">Tarih</th>
+                        <th class="text-center" scope="col">İşlemler</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>
+                                <div class="media">
+                                    <div class="avatar me-2">
+                                        <img alt="avatar" src="/cork-v3.8.0/polling.png" class="rounded-circle" />
+                                    </div>
+                                    <div class="media-body align-self-center">
+                                        <h6 class="mb-0">@item.Name</h6>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="media">
+                                    <div class="avatar me-2">
+                                        <img alt="avatar" src="/cork-v3.8.0/Class-Foto/@item.Class.ImageUrl" class="rounded-circle" />
+                                    </div>
+                                    <div class="media-body align-self-center">
+                                        <h6 class="mb-0">@item.Class.Name</h6>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <p class="mb-0">Sefa Sihlar</p>
+                                <span class="text-success">Yazılımcı</span>
+                            </td>
+                            <td class="text-center">
+                                <span class="badge badge-light-success">@item.CreatedDate</span>
+                            </td>
+
+
+                            <td style="vertical-align: middle;">
+                                <div class="d-flex justify-content-center align-items-center">
+                                    <a class="btn btngetdetail badge badge-light-primary text-start me-2 action-edit" data-bs-toggle="modal" data-bs-target="#Detay" data-id3="@item.ClassId" data-id4="@item.Id">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"  stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-edit-3">
+                                            <path d="M12 20h9"></path>
+                                            <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
+                                        </svg>
+                                    </a>
+                                    <a class="badge btnStudentGetWhere badge-light-success text-start me-2 action-edit" style="" href="/Polling/GetWithStudentList/@item.Id" >
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-eye">
+                                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                            <circle cx="12" cy="12" r="3"></circle>
+                                        </svg>
+                                    </a>
+                                    <div class="ms-2">
+                                        <a class="btn btnGetWhere d-flex align-items-center justify-content-center" data-id1="@item.ClassId" data-id2="@item.Id" data-bs-toggle="modal" data-bs-target="#Yoklama" style="height: 28px; width: 26px;">
+                                            <span class="align-middle">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-person-plus" viewBox="0 0 16 16">
+                                                    <path d="M6 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm2-3a2 2 0 1 1-4 0 2 2 0 0 1 4 0zm4 8c0 1-1 1-1 1H1s-1 0-1-1 1-4 6-4 6 3 6 4zm-1-.004c-.001-.246-.154-.986-.832-1.664C9.516 10.68 8.289 10 6 10c-2.29 0-3.516.68-4.168 1.332-.678.678-.83 1.418-.832 1.664h10z" />
+                                                    <path fill-rule="evenodd" d="M13.5 5a.5.5 0 0 1 .5.5V7h1.5a.5.5 0 0 1 0 1H14v1.5a.5.5 0 0 1-1 0V8h-1.5a.5.5 0 0 1 0-1H13V5.5a.5.5 0 0 1 .5-.5z" />
+                                                </svg>
+                                            </span>
+                                        </a>
+                                    </div>
+                                    <div class="ms-2">
+                                        <a class="badge badge-light-danger text-start me-2 action-edit" style="" href="/Polling/Delete/@item.Id">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash3" viewBox="0 0 16 16">
+                                                <path d="M6.5 1h3a.5.5 0 0 1 .5.5v1H6v-1a.5.5 0 0 1 .5-.5ZM11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3A1.5 1.5 0 0 0 5 1.5v1H2.506a.58.58 0 0 0-.01 0H1.5a.5.5 0 0 0 0 1h.538l.853 10.66A2 2 0 0 0 4.885 16h6.23a2 2 0 0 0 1.994-1.84l.853-10.66h.538a.5.5 0 0 0 0-1h-.995a.59.59 0 0 0-.01 0H11Zm1.958 1-.846 10.58a1 1 0 0 1-.997.92h-6.23a1 1 0 0 1-.997-.92L3.042 3.5h9.916Zm-7.487 1a.5.5 0 0 1 .528.47l.5 8.5a.5.5 0 0 1-.998.06L5 5.03a.5.5 0 0 1 .47-.53Zm5.058 0a.5.5 0 0 1 .47.53l-.5 8.5a.5.5 0 1 1-.998-.06l.5-8.5a.5.5 0 0 1 .528-.47ZM8 4.5a.5.5 0 0 1 .5.5v8.5a.5.5 0 0 1-1 0V5a.5.5 0 0 1 .5-.5Z" />
+                                            </svg>
+                                        </a>
+                                    </div>
+
+                                </div>
+                            </td>
+
+                        </tr>
+                    }
+               
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
